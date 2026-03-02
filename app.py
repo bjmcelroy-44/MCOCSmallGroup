@@ -528,6 +528,14 @@ def inject_global_styles() -> None:
             padding: 0.34rem 0.52rem;
             margin: 0.2rem 0 0.45rem 0;
         }
+        .sg-inline-nav-title {
+            font-size: 0.73rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted);
+            font-weight: 700;
+            margin: 0 0 0.22rem 0;
+        }
         .sg-lesson-status-line {
             margin: -0.18rem 0 0.55rem 0;
         }
@@ -1651,6 +1659,23 @@ def render_status_badge(status: str) -> str:
     )
 
 
+def render_inline_navigation(pages: List[str]) -> None:
+    with st.container(border=True):
+        st.markdown("<div class='sg-inline-nav-title'>Navigation</div>", unsafe_allow_html=True)
+        nav_cols = st.columns(len(pages))
+        active_page = str(st.session_state.get("active_page", "Home"))
+        for idx, nav_page in enumerate(pages):
+            if nav_cols[idx].button(
+                nav_page,
+                key=f"inline_nav_button_{nav_page}",
+                type="primary" if active_page == nav_page else "secondary",
+                use_container_width=True,
+            ):
+                st.session_state["active_page"] = nav_page
+                st.rerun()
+        st.caption("Mobile tip: use these buttons when the sidebar is hidden.")
+
+
 def render_dashboard(lessons_df: pd.DataFrame) -> None:
     st.header("MCOC Small Group")
 
@@ -1686,7 +1711,10 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
     )
 
     if upcoming_df.empty:
-        st.info("No upcoming meeting dates yet. Add dates from Admin > Meeting Date Admin.")
+        st.info("No upcoming meeting dates yet. Add dates from Admin.")
+        if st.button("Add a new Meeting", key="dashboard_go_admin_empty", type="primary"):
+            st.session_state["active_page"] = "Admin"
+            st.rerun()
         return
 
     date_ids = upcoming_df["id"].astype(int).tolist()
@@ -1699,7 +1727,17 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
     selected_id = int(st.session_state["dashboard_selected_upcoming_id"])
 
     with st.container(border=True):
-        st.markdown("#### Active Meeting Dates")
+        header_left, header_right = st.columns([1.65, 1.0])
+        with header_left:
+            st.markdown("#### Active Meeting Dates")
+        with header_right:
+            if st.button(
+                "Add a new Meeting",
+                key="dashboard_go_admin_add_meeting",
+                use_container_width=True,
+            ):
+                st.session_state["active_page"] = "Admin"
+                st.rerun()
         st.caption("Click a date to switch meeting details below.")
         date_rows = upcoming_df.to_dict(orient="records")
         card_columns = 4
@@ -1764,91 +1802,95 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
 
     with st.container(border=True):
         st.markdown("#### Meeting Details")
-        row_top_left, row_top_right = st.columns([1.05, 1.95])
-        with row_top_left:
-            st.text_input("Date", value=format_meeting_date(selected_meeting_date), disabled=True)
-        with row_top_right:
-            lesson_week = st.selectbox(
-                "Lesson",
-                options=weeks,
-                index=weeks.index(lesson_default_week),
-                format_func=lesson_option_label,
-                key=f"dashboard_lesson_select_{selected_id}",
-                on_change=mark_state_true,
-                args=(lesson_touch_key,),
-            )
-            if st.session_state.get(lesson_touch_key, False):
-                selected_lesson_dates = scheduled_dates_by_week.get(int(lesson_week), [])
-                if selected_lesson_dates:
-                    preview = ", ".join(selected_lesson_dates[:2])
-                    if len(selected_lesson_dates) > 2:
-                        preview = f"{preview} (+{len(selected_lesson_dates) - 2})"
-                    st.caption(f"Lesson date: {preview}")
+        details_col, meal_col = st.columns([1.4, 1.0])
 
-        people_left, people_right = st.columns(2)
-        with people_left:
-            host_select = st.selectbox(
-                "Host",
-                options=dashboard_person_options,
-                index=dashboard_person_options.index(host_default_selection),
-                key=f"dashboard_host_select_{selected_id}",
-            )
-        with people_right:
-            facilitator_select = st.selectbox(
-                "Facilitator",
-                options=dashboard_person_options,
-                index=dashboard_person_options.index(facilitator_default_selection),
-                key=f"dashboard_facilitator_select_{selected_id}",
-            )
-
-        selected_notes = st.text_area(
-            "Notes",
-            value=selected_row["notes"],
-            key=f"dashboard_notes_{selected_id}",
-            height=74,
-        )
-
-        original_notes = "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
-        has_unsaved_changes = (
-            int(lesson_week) != int(lesson_default_week)
-            or str(host_select) != str(host_default_selection)
-            or str(facilitator_select) != str(facilitator_default_selection)
-            or str(selected_notes) != str(original_notes)
-        )
-
-        if has_unsaved_changes:
-            st.markdown(
-                (
-                    "<div class='sg-save-required'>"
-                    "Changes are not stored automatically. Click <b>Save Meeting Details</b> to keep updates."
-                    "</div>"
-                ),
-                unsafe_allow_html=True,
-            )
-
-        save_date_details = st.button(
-            "Save Meeting Details",
-            key=f"dashboard_save_date_details_{selected_id}",
-            type="primary",
-            use_container_width=True,
-        )
-
-        if save_date_details:
-            if not has_unsaved_changes:
-                notify("No meeting detail changes to save.", "info")
-            else:
-                update_upcoming_meeting(
-                    selected_id,
-                    int(lesson_week),
-                    str(host_select),
-                    str(facilitator_select),
-                    selected_notes,
+        with details_col:
+            date_col, lesson_col = st.columns([0.95, 1.45])
+            with date_col:
+                st.text_input("Date", value=format_meeting_date(selected_meeting_date), disabled=True)
+            with lesson_col:
+                lesson_week = st.selectbox(
+                    "Lesson",
+                    options=weeks,
+                    index=weeks.index(lesson_default_week),
+                    format_func=lesson_option_label,
+                    key=f"dashboard_lesson_select_{selected_id}",
+                    on_change=mark_state_true,
+                    args=(lesson_touch_key,),
                 )
-                queue_message("Meeting details saved.")
-                st.rerun()
+                if st.session_state.get(lesson_touch_key, False):
+                    selected_lesson_dates = scheduled_dates_by_week.get(int(lesson_week), [])
+                    if selected_lesson_dates:
+                        preview = ", ".join(selected_lesson_dates[:2])
+                        if len(selected_lesson_dates) > 2:
+                            preview = f"{preview} (+{len(selected_lesson_dates) - 2})"
+                        st.caption(f"Lesson date: {preview}")
 
-        with st.expander("Meal (for this date)", expanded=True):
-            st.caption("Add entries, then click **Save meal list**.")
+            people_left, people_right = st.columns(2)
+            with people_left:
+                host_select = st.selectbox(
+                    "Host",
+                    options=dashboard_person_options,
+                    index=dashboard_person_options.index(host_default_selection),
+                    key=f"dashboard_host_select_{selected_id}",
+                )
+            with people_right:
+                facilitator_select = st.selectbox(
+                    "Facilitator",
+                    options=dashboard_person_options,
+                    index=dashboard_person_options.index(facilitator_default_selection),
+                    key=f"dashboard_facilitator_select_{selected_id}",
+                )
+
+            selected_notes = st.text_area(
+                "Notes",
+                value=selected_row["notes"],
+                key=f"dashboard_notes_{selected_id}",
+                height=62,
+            )
+
+            original_notes = "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
+            has_unsaved_changes = (
+                int(lesson_week) != int(lesson_default_week)
+                or str(host_select) != str(host_default_selection)
+                or str(facilitator_select) != str(facilitator_default_selection)
+                or str(selected_notes) != str(original_notes)
+            )
+
+            if has_unsaved_changes:
+                st.markdown(
+                    (
+                        "<div class='sg-save-required'>"
+                        "Changes are not stored automatically. Click <b>Save Meeting Details</b> to keep updates."
+                        "</div>"
+                    ),
+                    unsafe_allow_html=True,
+                )
+
+            save_date_details = st.button(
+                "Save Meeting Details",
+                key=f"dashboard_save_date_details_{selected_id}",
+                type="primary",
+                use_container_width=True,
+            )
+
+            if save_date_details:
+                if not has_unsaved_changes:
+                    notify("No meeting detail changes to save.", "info")
+                else:
+                    update_upcoming_meeting(
+                        selected_id,
+                        int(lesson_week),
+                        str(host_select),
+                        str(facilitator_select),
+                        selected_notes,
+                    )
+                    queue_message("Meeting details saved.")
+                    st.rerun()
+
+        with meal_col:
+            st.markdown("##### Meal (for this date)")
+            st.caption("Add rows, then click Save meal list.")
             meal_df = fetch_upcoming_meal_signups(selected_id)
             original_meal_rows = normalize_meal_rows(meal_df.to_dict(orient="records"))
             meal_editor_df = st.data_editor(
@@ -1856,7 +1898,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                 hide_index=True,
                 use_container_width=True,
                 num_rows="dynamic",
-                height=170,
+                height=144,
                 column_order=["Name", "Dish"],
                 column_config={
                     "Name": st.column_config.TextColumn("Name", width="medium"),
@@ -2624,6 +2666,7 @@ def main() -> None:
     page = str(st.session_state.get("active_page", "Home"))
 
     show_queued_message()
+    render_inline_navigation(pages)
 
     if warning_msg:
         st.warning(warning_msg)
