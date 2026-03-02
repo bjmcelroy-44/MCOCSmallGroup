@@ -1660,6 +1660,48 @@ def render_status_badge(status: str) -> str:
     )
 
 
+def get_lesson_unit_overview(
+    lessons_df: pd.DataFrame,
+) -> List[dict]:
+    theme_lookup = lessons_df.set_index("week")["theme"].to_dict()
+    unit_definitions = [
+        {
+            "title": "Unit 1: Foundations",
+            "summary": "Core BibleProject themes that frame the story of Scripture.",
+            "weeks": list(range(1, 9)),
+        },
+        {
+            "title": "Unit 2: Sermon on the Mount",
+            "summary": "Jesus' Kingdom teaching and practical discipleship.",
+            "weeks": list(range(9, 19)),
+        },
+        {
+            "title": "Unit 3: God's Character",
+            "summary": "How God describes Himself and forms our character.",
+            "weeks": list(range(19, 25)),
+        },
+    ]
+
+    units: List[dict] = []
+    for unit in unit_definitions:
+        unit_weeks = [int(week) for week in unit["weeks"] if int(week) in theme_lookup]
+        if not unit_weeks:
+            continue
+        lesson_rows = [
+            f"Lesson {int(week)}: {str(theme_lookup.get(int(week), '')).strip()}"
+            for week in unit_weeks
+        ]
+        units.append(
+            {
+                "title": unit["title"],
+                "summary": unit["summary"],
+                "lessons": lesson_rows,
+            }
+        )
+
+    return units
+
+
 def render_inline_navigation(pages: List[str]) -> None:
     with st.container(border=True):
         st.markdown("<div class='sg-inline-nav-title'>Navigation</div>", unsafe_allow_html=True)
@@ -1958,6 +2000,7 @@ def render_lessons_page(lessons_df: pd.DataFrame) -> None:
     status_map = derive_status_map(lessons_df)
     weeks = lessons_df["week"].astype(int).tolist()
     theme_lookup = lessons_df.set_index("week")["theme"].to_dict()
+    unit_overview = get_lesson_unit_overview(lessons_df)
     upcoming_df = fetch_upcoming_meetings(lessons_df)
     scheduled_date_by_week: Dict[int, str] = {}
     for row in upcoming_df.to_dict(orient="records"):
@@ -2006,7 +2049,9 @@ def render_lessons_page(lessons_df: pd.DataFrame) -> None:
 
     with st.container(border=True):
         st.markdown("#### Lesson Plans")
-        st.caption("Scroll sideways and click a card. Dark card is selected.")
+        st.caption(
+            "Scroll sideways and click a card. Dark card is selected. Lesson Overview is at the bottom of the page."
+        )
         cards_html = ['<div class="sg-lesson-rolodex-scroll">']
         for week in filtered_weeks:
             is_selected = int(week) == int(selected_week)
@@ -2185,6 +2230,33 @@ def render_lessons_page(lessons_df: pd.DataFrame) -> None:
                 st.session_state["lessons_selected_week"] = int(selected_week)
                 queue_message(f"Lesson {selected_week} marked completed. All lessons are now done.")
             st.rerun()
+
+    if unit_overview:
+        with st.container(border=True):
+            st.markdown("#### Lesson Overview")
+            st.markdown(
+                (
+                    "This 24-lesson journey is designed to move our group from God's big story to "
+                    "Jesus' way of life to deep trust in God's character. We start with 8 Big Themes "
+                    "(Image of God through Heaven & Earth) to give everyone-kids and adults-a shared "
+                    "\"map\" of the Bible: who we are, what God is doing, and why Jesus matters. From "
+                    "there, we step into the Sermon on the Mount unit, where Jesus takes that story "
+                    "and turns it into a daily discipleship blueprint-how Kingdom people speak, pray, "
+                    "handle anxiety and money, treat others, and build a life that lasts. Finally, we "
+                    "finish with Character of God (anchored in Exodus 34:6-7) so the whole year lands "
+                    "not just in better habits, but in greater confidence in who God is-compassionate, "
+                    "gracious, patient, loyal, and faithful-because lasting obedience grows best from "
+                    "worship and trust. Each unit builds on the previous one: identity and story -> "
+                    "practices and choices -> trust and formation, so the group leaves with a clear "
+                    "sense of the Bible's message and a practical call to live it together."
+                )
+            )
+            for idx, unit in enumerate(unit_overview):
+                st.markdown(f"**{unit['title']}**")
+                st.caption(unit["summary"])
+                with st.expander(f"Show lessons in {unit['title']}", expanded=False):
+                    lesson_lines = "\n".join([f"- {line}" for line in unit["lessons"]])
+                    st.markdown(lesson_lines)
 
 
 def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
