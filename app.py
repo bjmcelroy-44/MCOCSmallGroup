@@ -921,7 +921,7 @@ def format_meeting_date(iso_date: str) -> str:
         parsed = date.fromisoformat(str(iso_date))
     except (TypeError, ValueError):
         return str(iso_date)
-    return f"{parsed.strftime('%a')} {parsed.month}/{parsed.day}/{parsed.year}"
+    return parsed.strftime("%m/%d/%y")
 
 
 def add_meeting_log(
@@ -1012,6 +1012,7 @@ def fetch_meeting_log(lessons_df: pd.DataFrame) -> pd.DataFrame:
         )
 
     theme_lookup = lessons_df.set_index("week")["theme"].to_dict()
+    df["meeting_date"] = df["meeting_date"].apply(format_meeting_date)
     df["lesson_theme"] = df["lesson_week"].map(theme_lookup).fillna("(Unknown lesson)")
     df["notes"] = df["notes"].fillna("")
     df["host_name"] = df["host_name"].fillna("")
@@ -2238,7 +2239,11 @@ def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
         st.markdown("#### Add New Meeting Date")
         st.caption("Create a new upcoming date. It will appear in Active Meeting Dates below.")
         with st.form("meeting_log_add_meeting_date_form", clear_on_submit=True):
-            new_meeting_date = st.date_input("Meeting date", value=date.today())
+            new_meeting_date = st.date_input(
+                "Meeting date",
+                value=date.today(),
+                format="MM/DD/YYYY",
+            )
             new_meeting_week = st.selectbox(
                 "Lesson",
                 options=weeks,
@@ -2250,7 +2255,8 @@ def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
             else:
                 st.caption("Next available lesson: all uncompleted lessons are already scheduled.")
             st.caption("Host and Facilitator default to TBD until assigned.")
-            add_meeting_date = st.form_submit_button("Add meeting date", use_container_width=True)
+            add_button_label = "Add Meeting to Active Dates"
+            add_meeting_date = st.form_submit_button(add_button_label, use_container_width=True)
 
     if add_meeting_date:
         add_upcoming_meeting(
@@ -2322,50 +2328,69 @@ def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
             )
 
             st.markdown("**Edit Selected Meeting Date**")
-            with st.form(f"meeting_log_edit_upcoming_form_{selected_upcoming_id}"):
-                st.text_input(
-                    "Date",
-                    value=format_meeting_date(selected_row["meeting_date"]),
-                    disabled=True,
-                )
-                edit_week = st.selectbox(
-                    "Lesson",
-                    options=weeks,
-                    index=weeks.index(selected_week),
-                    format_func=lesson_dropdown_label,
-                    key=f"meeting_log_edit_upcoming_lesson_{selected_upcoming_id}",
-                )
-                c1, c2 = st.columns(2)
-                edit_host_select = c1.selectbox(
-                    "Host",
-                    options=edit_person_options,
-                    index=edit_person_options.index(host_default_selection),
-                    key=f"meeting_log_edit_upcoming_host_{selected_upcoming_id}",
-                )
-                edit_facilitator_select = c2.selectbox(
-                    "Facilitator",
-                    options=edit_person_options,
-                    index=edit_person_options.index(facilitator_default_selection),
-                    key=f"meeting_log_edit_upcoming_facilitator_{selected_upcoming_id}",
-                )
-                edit_notes = st.text_area(
-                    "Notes",
-                    value=str(selected_row["notes"]),
-                    height=80,
-                    key=f"meeting_log_edit_upcoming_notes_{selected_upcoming_id}",
-                )
-                save_selected_upcoming = st.form_submit_button("Save selected meeting date")
+            st.text_input(
+                "Date",
+                value=format_meeting_date(selected_row["meeting_date"]),
+                disabled=True,
+            )
+            edit_week = st.selectbox(
+                "Lesson",
+                options=weeks,
+                index=weeks.index(selected_week),
+                format_func=lesson_dropdown_label,
+                key=f"meeting_log_edit_upcoming_lesson_{selected_upcoming_id}",
+            )
+            c1, c2 = st.columns(2)
+            edit_host_select = c1.selectbox(
+                "Host",
+                options=edit_person_options,
+                index=edit_person_options.index(host_default_selection),
+                key=f"meeting_log_edit_upcoming_host_{selected_upcoming_id}",
+            )
+            edit_facilitator_select = c2.selectbox(
+                "Facilitator",
+                options=edit_person_options,
+                index=edit_person_options.index(facilitator_default_selection),
+                key=f"meeting_log_edit_upcoming_facilitator_{selected_upcoming_id}",
+            )
+            edit_notes = st.text_area(
+                "Notes",
+                value=str(selected_row["notes"]),
+                height=80,
+                key=f"meeting_log_edit_upcoming_notes_{selected_upcoming_id}",
+            )
 
-            if save_selected_upcoming:
-                update_upcoming_meeting(
-                    selected_upcoming_id,
-                    int(edit_week),
-                    str(edit_host_select),
-                    str(edit_facilitator_select),
-                    edit_notes,
+            original_edit_notes = "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
+            edit_has_unsaved_changes = (
+                int(edit_week) != int(selected_week)
+                or str(edit_host_select) != str(host_default_selection)
+                or str(edit_facilitator_select) != str(facilitator_default_selection)
+                or str(edit_notes) != str(original_edit_notes)
+            )
+
+            if edit_has_unsaved_changes:
+                st.markdown(
+                    (
+                        "<div class='sg-save-required'>"
+                        "Changes are not stored automatically. Click <b>Save selected meeting date</b> to keep updates."
+                        "</div>"
+                    ),
+                    unsafe_allow_html=True,
                 )
-                queue_message("Selected meeting date updated.")
-                st.rerun()
+
+            if st.button("Save selected meeting date", use_container_width=True):
+                if not edit_has_unsaved_changes:
+                    notify("No meeting date changes to save.", "info")
+                else:
+                    update_upcoming_meeting(
+                        selected_upcoming_id,
+                        int(edit_week),
+                        str(edit_host_select),
+                        str(edit_facilitator_select),
+                        edit_notes,
+                    )
+                    queue_message("Selected meeting date updated.")
+                    st.rerun()
 
             delete_pending_key = f"meeting_log_delete_pending_upcoming_{selected_upcoming_id}"
             if st.button(
