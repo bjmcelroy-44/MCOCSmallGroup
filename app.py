@@ -164,6 +164,7 @@ def init_db() -> None:
         )
         _ensure_column(conn, "meeting_log", "host_name", "TEXT NOT NULL DEFAULT ''")
         _ensure_column(conn, "meeting_log", "facilitator_name", "TEXT NOT NULL DEFAULT ''")
+        _ensure_column(conn, "upcoming_meetings", "main_meal", "TEXT NOT NULL DEFAULT ''")
 
         existing_count = conn.execute(
             "SELECT COUNT(*) AS count FROM small_group_families"
@@ -638,25 +639,150 @@ def inject_global_styles() -> None:
         }
         .sg-selection-summary {
             margin: 0.4rem 0 0.25rem 0;
-            padding: 0.58rem 0.7rem;
+            padding: 0.52rem 0.62rem;
             border: 1px solid var(--sg-border);
             border-radius: var(--sg-radius-md);
             background: var(--sg-surface-muted);
         }
         .sg-selection-summary-title {
             margin: 0;
-            font-size: 0.68rem;
-            letter-spacing: 0.08em;
+            font-size: 0.66rem;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--sg-muted-soft);
-            font-weight: 700;
+            font-weight: 650;
         }
-        .sg-selection-summary-value {
-            margin: 0.22rem 0 0 0;
+        .sg-selection-summary-main {
+            margin: 0.18rem 0 0 0;
             color: var(--sg-text);
-            font-size: 0.95rem;
+            font-size: 0.88rem;
+            font-weight: 540;
+            line-height: 1.28;
+        }
+        .sg-selection-meta-grid {
+            margin-top: 0.34rem;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.26rem 0.46rem;
+        }
+        .sg-selection-meta-item {
+            margin: 0;
+            font-size: 0.74rem;
+            line-height: 1.2;
+            color: var(--sg-text);
+            font-weight: 520;
+        }
+        .sg-selection-meta-label {
+            color: var(--sg-muted-soft);
+            font-weight: 650;
+            margin-right: 0.2rem;
+        }
+        .sg-sunday-calendar-grid {
+            display: block;
+            margin: 0.25rem 0 0.45rem 0;
+        }
+        .sg-calendar-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin: 0.15rem 0 0.45rem 0;
+        }
+        .sg-calendar-nav-label {
+            margin: 0;
+            font-size: 0.92rem;
+            font-weight: 650;
+            color: var(--sg-text);
+            text-align: center;
+            flex: 1;
+        }
+        .sg-sunday-month {
+            border: 1px solid var(--sg-border);
+            border-radius: 12px;
+            background: var(--sg-surface);
+            padding: 0.62rem;
+        }
+        .sg-sunday-month-title {
+            margin: 0 0 0.42rem 0;
+            font-size: 0.9rem;
+            font-weight: 650;
+            color: var(--sg-text);
+        }
+        .sg-sunday-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.32rem;
+        }
+        .sg-sunday-item {
+            border: 2px solid var(--sg-border);
+            border-radius: 10px;
+            padding: 0.42rem 0.52rem;
+            min-height: 0;
+            background: var(--sg-surface-muted);
+            color: var(--sg-text);
+        }
+        .sg-sunday-item-link {
+            display: block;
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+        .sg-sunday-item-clickable {
+            cursor: pointer;
+            transition: transform 100ms ease, box-shadow 100ms ease;
+        }
+        .sg-sunday-item-clickable:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--sg-shadow-sm);
+        }
+        .sg-sunday-item-has-meeting {
+            background: var(--sg-primary-soft);
+            border-color: var(--sg-border-strong);
+            min-height: 98px;
+            padding: 0.48rem 0.56rem;
+        }
+        .sg-sunday-item-empty {
+            background: var(--sg-surface);
+            border-color: var(--sg-border);
+            padding: 0.3rem 0.46rem;
+        }
+        .sg-sunday-item-selected {
+            border: 3px solid #7a7f87;
+            background: var(--sg-surface);
+        }
+        .sg-sunday-date {
+            margin: 0;
+            font-size: 0.78rem;
             font-weight: 620;
-            line-height: 1.3;
+            line-height: 1.2;
+        }
+        .sg-sunday-meta {
+            margin: 0.2rem 0 0 0;
+            font-size: 0.72rem;
+            color: var(--sg-muted-soft);
+            line-height: 1.2;
+        }
+        .sg-sunday-details {
+            margin-top: 0.18rem;
+            display: grid;
+            gap: 0.12rem;
+        }
+        .sg-sunday-detail-line {
+            margin: 0;
+            font-size: 0.64rem;
+            line-height: 1.2;
+            color: var(--sg-text);
+        }
+        .sg-sunday-detail-line b {
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+            margin-right: 0.12rem;
+        }
+        .sg-sunday-empty-label {
+            margin: 0.16rem 0 0 0;
+            font-size: 0.62rem;
+            color: var(--sg-muted-soft);
+            line-height: 1.15;
+            font-weight: 600;
         }
         .sg-lesson-rolodex-scroll {
             display: flex;
@@ -896,6 +1022,12 @@ def inject_global_styles() -> None:
             }
             .sg-page-title {
                 font-size: 1.24rem;
+            }
+            .sg-sunday-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .sg-selection-meta-grid {
+                grid-template-columns: 1fr;
             }
             section[data-testid="stSidebar"] .stButton > button {
                 min-height: 2.12rem;
@@ -1321,14 +1453,15 @@ def add_upcoming_meeting(
     host_name: str,
     facilitator_name: str,
     notes: str,
+    main_meal: str = "",
 ) -> None:
     with get_connection() as conn:
         conn.execute(
             """
             INSERT INTO upcoming_meetings (
-                meeting_date, lesson_week, host_name, facilitator_name, notes
+                meeting_date, lesson_week, host_name, facilitator_name, notes, main_meal
             )
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
                 meeting_date.isoformat(),
@@ -1336,6 +1469,7 @@ def add_upcoming_meeting(
                 host_name.strip(),
                 facilitator_name.strip(),
                 notes.strip(),
+                str(main_meal).strip(),
             ),
         )
 
@@ -1346,12 +1480,14 @@ def update_upcoming_meeting(
     host_name: str,
     facilitator_name: str,
     notes: str,
+    main_meal: str | None = None,
 ) -> None:
     with get_connection() as conn:
         conn.execute(
             """
             UPDATE upcoming_meetings
-            SET lesson_week = ?, host_name = ?, facilitator_name = ?, notes = ?
+            SET lesson_week = ?, host_name = ?, facilitator_name = ?, notes = ?,
+                main_meal = COALESCE(?, main_meal)
             WHERE id = ?
             """,
             (
@@ -1359,6 +1495,7 @@ def update_upcoming_meeting(
                 host_name.strip(),
                 facilitator_name.strip(),
                 notes.strip(),
+                None if main_meal is None else str(main_meal).strip(),
                 int(record_id),
             ),
         )
@@ -1377,7 +1514,7 @@ def fetch_upcoming_meetings(lessons_df: pd.DataFrame) -> pd.DataFrame:
     with get_connection() as conn:
         upcoming_df = pd.read_sql_query(
             """
-            SELECT id, meeting_date, lesson_week, host_name, facilitator_name, notes
+            SELECT id, meeting_date, lesson_week, host_name, facilitator_name, notes, main_meal
             FROM upcoming_meetings
             WHERE meeting_date >= ?
             ORDER BY meeting_date ASC, id ASC
@@ -1396,6 +1533,7 @@ def fetch_upcoming_meetings(lessons_df: pd.DataFrame) -> pd.DataFrame:
                 "host_name",
                 "facilitator_name",
                 "notes",
+                "main_meal",
             ]
         )
 
@@ -1404,7 +1542,7 @@ def fetch_upcoming_meetings(lessons_df: pd.DataFrame) -> pd.DataFrame:
         upcoming_df["lesson_week"].map(theme_lookup).fillna("(Unknown lesson)")
     )
 
-    for col in ["host_name", "facilitator_name", "notes"]:
+    for col in ["host_name", "facilitator_name", "notes", "main_meal"]:
         upcoming_df[col] = upcoming_df[col].fillna("")
 
     return upcoming_df[
@@ -1416,6 +1554,7 @@ def fetch_upcoming_meetings(lessons_df: pd.DataFrame) -> pd.DataFrame:
             "host_name",
             "facilitator_name",
             "notes",
+            "main_meal",
         ]
     ]
 
@@ -1476,51 +1615,181 @@ def save_upcoming_meal_signups(upcoming_meeting_id: int, rows: List[dict]) -> in
     return saved_count
 
 
-def render_upcoming_calendar(upcoming_df: pd.DataFrame) -> None:
+def render_upcoming_calendar(
+    upcoming_df: pd.DataFrame,
+    selected_date: str = "",
+) -> None:
     if upcoming_df.empty:
         st.info("No upcoming dates yet.")
         return
 
-    parsed_dates = pd.to_datetime(upcoming_df["meeting_date"], errors="coerce").dropna()
-    if parsed_dates.empty:
+    parsed_series = pd.to_datetime(upcoming_df["meeting_date"], errors="coerce").dropna()
+    parsed_dates = parsed_series.dt.date.tolist()
+    if not parsed_dates:
         st.info("No upcoming dates yet.")
         return
 
-    upcoming_days = set(parsed_dates.dt.date.tolist())
-    first_date = parsed_dates.min().date().replace(day=1)
-    last_date = parsed_dates.max().date().replace(day=1)
+    counts_by_date: Dict[date, int] = {}
+    for d in parsed_dates:
+        counts_by_date[d] = counts_by_date.get(d, 0) + 1
+    meetings_by_date: Dict[date, List[dict]] = {}
+    for row in upcoming_df.to_dict(orient="records"):
+        raw_date = str(row.get("meeting_date", "")).strip()
+        try:
+            meeting_day = date.fromisoformat(raw_date)
+        except Exception:
+            continue
+        meetings_by_date.setdefault(meeting_day, []).append(row)
 
-    year_month_pairs: List[Tuple[int, int]] = []
-    current_year, current_month = first_date.year, first_date.month
-    while (current_year, current_month) <= (last_date.year, last_date.month):
-        year_month_pairs.append((current_year, current_month))
-        if current_month == 12:
-            current_year += 1
-            current_month = 1
+    selected_date_obj: date | None = None
+    try:
+        selected_date_obj = date.fromisoformat(str(selected_date))
+    except Exception:
+        selected_date_obj = None
+
+    upcoming_days = set(parsed_dates)
+
+    def month_start(d: date) -> date:
+        return d.replace(day=1)
+
+    def next_month(d: date) -> date:
+        if d.month == 12:
+            return date(d.year + 1, 1, 1)
+        return date(d.year, d.month + 1, 1)
+
+    current_month_start = month_start(date.today())
+    first_date = current_month_start
+    max_upcoming_month = month_start(max(parsed_dates))
+    min_end_month = next_month(current_month_start)
+    last_date = max(max_upcoming_month, min_end_month)
+
+    months: List[date] = []
+    cursor = first_date
+    while cursor <= last_date:
+        months.append(cursor)
+        cursor = next_month(cursor)
+
+    if not months:
+        st.info("No Sunday dates are in the upcoming meeting range yet.")
+        return
+
+    month_key = "dashboard_calendar_month_idx"
+    selected_key = "dashboard_calendar_selected_date_cache"
+    month_lookup = {(m.year, m.month): idx for idx, m in enumerate(months)}
+    if month_key not in st.session_state:
+        st.session_state[month_key] = 0
+
+    selected_changed = st.session_state.get(selected_key) != str(selected_date)
+    if selected_changed:
+        st.session_state[selected_key] = str(selected_date)
+        if selected_date_obj is not None:
+            idx = month_lookup.get((selected_date_obj.year, selected_date_obj.month))
+            if idx is not None:
+                st.session_state[month_key] = idx
+
+    if st.session_state[month_key] < 0:
+        st.session_state[month_key] = 0
+    if st.session_state[month_key] >= len(months):
+        st.session_state[month_key] = len(months) - 1
+
+    month_idx = int(st.session_state[month_key])
+    active_month = months[month_idx]
+    nav_left, nav_mid, nav_right = st.columns([0.28, 0.44, 0.28])
+    with nav_left:
+        if st.button(
+            "Prev month",
+            key="dashboard_calendar_prev_month",
+            disabled=month_idx <= 0,
+            use_container_width=True,
+        ):
+            st.session_state[month_key] = max(0, month_idx - 1)
+            st.rerun()
+    with nav_mid:
+        st.markdown(
+            f"<p class='sg-calendar-nav-label'>{month_name[active_month.month]} {active_month.year}</p>",
+            unsafe_allow_html=True,
+        )
+    with nav_right:
+        if st.button(
+            "Next month",
+            key="dashboard_calendar_next_month",
+            disabled=month_idx >= (len(months) - 1),
+            use_container_width=True,
+        ):
+            st.session_state[month_key] = min(len(months) - 1, month_idx + 1)
+            st.rerun()
+
+    month_label = f"{month_name[active_month.month]} {active_month.year}"
+    weeks = monthcalendar(active_month.year, active_month.month)
+    sunday_days = [int(week[6]) for week in weeks if int(week[6]) > 0]
+    sunday_items: List[str] = []
+    for sunday_day in sunday_days:
+        sunday_date = date(active_month.year, active_month.month, sunday_day)
+        has_meeting = sunday_date in upcoming_days
+        is_selected = selected_date_obj is not None and sunday_date == selected_date_obj
+        classes = ["sg-sunday-item"]
+        if has_meeting:
+            classes.append("sg-sunday-item-has-meeting")
         else:
-            current_month += 1
+            classes.append("sg-sunday-item-empty")
+        if is_selected:
+            classes.append("sg-sunday-item-selected")
+        details_html = ""
+        empty_html = ""
+        card_open = ""
+        card_close = ""
+        if has_meeting:
+            detail_rows: List[str] = []
+            meeting_rows_for_date = meetings_by_date.get(sunday_date, [])
+            target_id: int | None = None
+            if meeting_rows_for_date:
+                try:
+                    target_id = int(meeting_rows_for_date[0].get("id"))
+                except Exception:
+                    target_id = None
+            if target_id is not None:
+                classes.append("sg-sunday-item-clickable")
+                card_open = (
+                    f"<a class='sg-sunday-item-link' href='?dashboard_pick={int(target_id)}' target='_self'>"
+                )
+                card_close = "</a>"
+            for meeting_row in meeting_rows_for_date:
+                host = str(meeting_row.get("host_name", "")).strip() or TBD_OPTION
+                facilitator = str(meeting_row.get("facilitator_name", "")).strip() or TBD_OPTION
+                lesson_title = str(meeting_row.get("lesson_theme", "")).strip() or "(No lesson)"
+                detail_rows.extend(
+                    [
+                        f"<p class='sg-sunday-detail-line'><b>Host:</b> {escape(host)}</p>",
+                        f"<p class='sg-sunday-detail-line'><b>Facilitator:</b> {escape(facilitator)}</p>",
+                        f"<p class='sg-sunday-detail-line'><b>Lesson:</b> {escape(lesson_title)}</p>",
+                    ]
+                )
+            details_html = f"<div class='sg-sunday-details'>{''.join(detail_rows)}</div>"
+        else:
+            empty_html = "<p class='sg-sunday-empty-label'>No Gathering</p>"
+        sunday_items.append(
+            (
+                f"{card_open}<div class='{' '.join(classes)}'>"
+                f"<p class='sg-sunday-date'>{sunday_date.strftime('%b %d, %Y')}</p>"
+                f"{details_html}{empty_html}"
+                f"</div>{card_close}"
+            )
+        )
 
-    st.caption("Bold dates have at least one upcoming meeting.")
-    headers = "| Mon | Tue | Wed | Thu | Fri | Sat | Sun |"
-    separator = "|---|---|---|---|---|---|---|"
+    st.caption(
+        "Sunday planning view. Swipe month using Prev/Next. Selected date is outlined."
+    )
+    month_html = (
+        "<div class='sg-sunday-calendar-grid'>"
+        "<div class='sg-sunday-month'>"
+        f"<p class='sg-sunday-month-title'>{month_label}</p>"
+        "<div class='sg-sunday-list'>"
+        f"{''.join(sunday_items)}"
+        "</div></div></div>"
+    )
+    st.markdown(month_html, unsafe_allow_html=True)
 
-    for year, month in year_month_pairs:
-        st.markdown(f"**{month_name[month]} {year}**")
-        rows = monthcalendar(year, month)
-        lines = [headers, separator]
-        for row in rows:
-            formatted_cells = []
-            for day in row:
-                if day == 0:
-                    formatted_cells.append(" ")
-                    continue
-                cell_date = date(year, month, day)
-                if cell_date in upcoming_days:
-                    formatted_cells.append(f"**{day}**")
-                else:
-                    formatted_cells.append(str(day))
-            lines.append("| " + " | ".join(formatted_cells) + " |")
-        st.markdown("\n".join(lines))
+
 def get_custom_questions(lesson_week: int) -> Dict[str, List[str]]:
     result = {level: [] for level in QUESTION_LEVELS}
 
@@ -1613,7 +1882,7 @@ def export_backup_data() -> dict:
         ).to_dict(orient="records")
         upcoming_meetings = pd.read_sql_query(
             """
-            SELECT id, meeting_date, lesson_week, host_name, facilitator_name, notes
+            SELECT id, meeting_date, lesson_week, host_name, facilitator_name, notes, main_meal
             FROM upcoming_meetings
             ORDER BY id
             """,
@@ -1755,23 +2024,24 @@ def import_backup_data(payload: dict) -> None:
             host_name = str(row.get("host_name", "")).strip()
             facilitator_name = str(row.get("facilitator_name", "")).strip()
             notes = str(row.get("notes", "")).strip()
+            main_meal = str(row.get("main_meal", "")).strip()
             if record_id is None:
                 conn.execute(
                     """
                     INSERT INTO upcoming_meetings (
-                        meeting_date, lesson_week, host_name, facilitator_name, notes
+                        meeting_date, lesson_week, host_name, facilitator_name, notes, main_meal
                     )
-                    VALUES (?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     """,
-                    (meeting_date, lesson_week, host_name, facilitator_name, notes),
+                    (meeting_date, lesson_week, host_name, facilitator_name, notes, main_meal),
                 )
             else:
                 conn.execute(
                     """
                     INSERT INTO upcoming_meetings (
-                        id, meeting_date, lesson_week, host_name, facilitator_name, notes
+                        id, meeting_date, lesson_week, host_name, facilitator_name, notes, main_meal
                     )
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         int(record_id),
@@ -1780,6 +2050,7 @@ def import_backup_data(payload: dict) -> None:
                         host_name,
                         facilitator_name,
                         notes,
+                        main_meal,
                     ),
                 )
 
@@ -2031,6 +2302,12 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
     ):
         st.session_state["dashboard_selected_upcoming_id"] = date_ids[0]
 
+    calendar_picked_id = get_query_param_int("dashboard_pick")
+    if calendar_picked_id is not None:
+        if int(calendar_picked_id) in date_ids:
+            st.session_state["dashboard_selected_upcoming_id"] = int(calendar_picked_id)
+        clear_query_param("dashboard_pick")
+
     selected_id = int(st.session_state["dashboard_selected_upcoming_id"])
     date_rows = upcoming_df.to_dict(orient="records")
     row_by_id = {int(row["id"]): row for row in date_rows}
@@ -2041,6 +2318,13 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
             "Choose a meeting date. The details panel below always edits the selected date.",
         )
         ordered_ids = [int(row["id"]) for row in date_rows]
+        selected_calendar_date = ""
+        if selected_id in row_by_id:
+            selected_calendar_date = str(row_by_id[selected_id].get("meeting_date", ""))
+        render_upcoming_calendar(
+            upcoming_df,
+            selected_date=selected_calendar_date,
+        )
 
         def date_selector_label(row_id: int) -> str:
             row = row_by_id.get(int(row_id), {})
@@ -2100,6 +2384,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
         if saved_facilitator in dashboard_person_options
         else TBD_OPTION
     )
+    saved_main_meal = str(selected_row.get("main_meal", "")).strip()
 
     lesson_default_week = (
         int(selected_row["lesson_week"])
@@ -2109,6 +2394,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
     lesson_touch_key = f"dashboard_lesson_dropdown_touched_{selected_id}"
     if lesson_touch_key not in st.session_state:
         st.session_state[lesson_touch_key] = False
+    original_notes = "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
 
     def lesson_option_label(week: int) -> str:
         base = f"Lesson {week} - {theme_lookup.get(week, '')}"
@@ -2122,25 +2408,181 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
     with st.container(border=True):
         render_section_header(
             f"Meeting Details: {format_meeting_date(selected_meeting_date)}",
-            "You are editing the selected meeting date from the section above.",
+            "Primary action: sign up for roles and food first, then adjust lesson details if needed.",
         )
         selected_lesson_theme = str(theme_lookup.get(int(selected_row["lesson_week"]), "")).strip()
+        meal_df_for_summary = fetch_upcoming_meal_signups(selected_id)
+        meal_signup_count = len(
+            normalize_meal_rows(meal_df_for_summary.to_dict(orient="records"))
+        )
         st.markdown(
             (
                 "<div class='sg-selection-summary'>"
                 "<p class='sg-selection-summary-title'>Currently Editing</p>"
-                f"<p class='sg-selection-summary-value'>{escape(format_meeting_date(selected_meeting_date))}"
-                f" | Lesson {int(selected_row['lesson_week'])}"
+                f"<p class='sg-selection-summary-main'>{escape(format_meeting_date(selected_meeting_date))} · "
+                f"Lesson {int(selected_row['lesson_week'])}"
                 f"{escape(' - ' + selected_lesson_theme) if selected_lesson_theme else ''}</p>"
+                "<div class='sg-selection-meta-grid'>"
+                "<p class='sg-selection-meta-item'>"
+                "<span class='sg-selection-meta-label'>Host</span>"
+                f"{escape(host_default_selection)}"
+                "</p>"
+                "<p class='sg-selection-meta-item'>"
+                "<span class='sg-selection-meta-label'>Facilitator</span>"
+                f"{escape(facilitator_default_selection)}"
+                "</p>"
+                "<p class='sg-selection-meta-item'>"
+                "<span class='sg-selection-meta-label'>Main Meal</span>"
+                f"{escape(saved_main_meal if saved_main_meal else 'Not set')}"
+                "</p>"
+                "<p class='sg-selection-meta-item'>"
+                "<span class='sg-selection-meta-label'>Food Signups</span>"
+                f"{int(meal_signup_count)}"
+                "</p>"
+                "</div>"
                 "</div>"
             ),
             unsafe_allow_html=True,
         )
-        tab_details, tab_meal, tab_complete = st.tabs(
-            ["Details", "Meal Plan", "Complete"]
+        tab_signup, tab_details, tab_complete = st.tabs(
+            ["Sign Up (Roles + Food)", "Meeting Details", "Complete"]
         )
 
+        with tab_signup:
+            render_section_header(
+                "Role Sign-up",
+                "Select who is hosting and facilitating for this meeting date.",
+            )
+            people_left, people_right = st.columns(2)
+            with people_left:
+                host_select = st.selectbox(
+                    "Host",
+                    options=dashboard_person_options,
+                    index=dashboard_person_options.index(host_default_selection),
+                    key=f"dashboard_host_select_{selected_id}",
+                )
+            with people_right:
+                facilitator_select = st.selectbox(
+                    "Facilitator",
+                    options=dashboard_person_options,
+                    index=dashboard_person_options.index(facilitator_default_selection),
+                    key=f"dashboard_facilitator_select_{selected_id}",
+                )
+            main_meal_input = st.text_input(
+                "Main meal provided by host",
+                value=saved_main_meal,
+                key=f"dashboard_main_meal_{selected_id}",
+                placeholder="Example: Taco bar, Lasagna, BBQ chicken",
+            )
+
+            role_has_unsaved_changes = (
+                str(host_select) != str(host_default_selection)
+                or str(facilitator_select) != str(facilitator_default_selection)
+                or str(main_meal_input).strip() != str(saved_main_meal)
+            )
+            if role_has_unsaved_changes:
+                st.markdown(
+                    (
+                        "<div class='sg-save-required'>"
+                        "Role changes are unsaved. Click <b>Save role sign-up</b>."
+                        "</div>"
+                    ),
+                    unsafe_allow_html=True,
+                )
+
+            if st.button(
+                "Save role sign-up",
+                key=f"dashboard_save_roles_{selected_id}",
+                type="primary",
+                use_container_width=True,
+            ):
+                if not role_has_unsaved_changes:
+                    notify("No role sign-up changes to save.", "info")
+                else:
+                    current_lesson_week = int(
+                        st.session_state.get(
+                            f"dashboard_lesson_select_{selected_id}",
+                            lesson_default_week,
+                        )
+                    )
+                    current_notes = str(
+                        st.session_state.get(
+                            f"dashboard_notes_{selected_id}",
+                            original_notes,
+                        )
+                    )
+                    update_upcoming_meeting(
+                        selected_id,
+                        current_lesson_week,
+                        str(host_select),
+                        str(facilitator_select),
+                        current_notes,
+                        str(main_meal_input).strip(),
+                    )
+                    queue_message("Role sign-up saved.")
+                    st.rerun()
+
+            saved_or_current_main_meal = str(
+                st.session_state.get(
+                    f"dashboard_main_meal_{selected_id}",
+                    saved_main_meal,
+                )
+            ).strip()
+            render_section_header(
+                f"Food Sign-up ({meal_date_label})",
+                (
+                    f"Main meal: {saved_or_current_main_meal}. Add sides, desserts, and drinks."
+                    if saved_or_current_main_meal
+                    else "Add each family and what they are bringing."
+                ),
+            )
+            meal_df = fetch_upcoming_meal_signups(selected_id)
+            original_meal_rows = normalize_meal_rows(meal_df.to_dict(orient="records"))
+            meal_editor_df = st.data_editor(
+                meal_df,
+                hide_index=True,
+                use_container_width=True,
+                num_rows="dynamic",
+                height=194,
+                column_order=["Name", "Dish"],
+                column_config={
+                    "Name": st.column_config.TextColumn("Name", width="medium"),
+                    "Dish": st.column_config.TextColumn("Dish", width="large"),
+                },
+                key=f"dashboard_meal_editor_{selected_id}",
+            )
+            edited_meal_rows = normalize_meal_rows(meal_editor_df.to_dict(orient="records"))
+            meal_has_unsaved_changes = edited_meal_rows != original_meal_rows
+
+            if meal_has_unsaved_changes:
+                st.markdown(
+                    (
+                        "<div class='sg-save-required'>"
+                        "Food sign-up changes are unsaved. Click <b>Save food sign-up</b>."
+                        "</div>"
+                    ),
+                    unsafe_allow_html=True,
+                )
+
+            if st.button(
+                "Save food sign-up",
+                key=f"dashboard_save_meal_{selected_id}",
+                use_container_width=True,
+            ):
+                if not meal_has_unsaved_changes:
+                    notify("No food sign-up changes to save.", "info")
+                else:
+                    saved_entries = save_upcoming_meal_signups(
+                        selected_id, meal_editor_df.to_dict(orient="records")
+                    )
+                    queue_message(f"Food sign-up saved ({saved_entries} entries).")
+                    st.rerun()
+
         with tab_details:
+            render_section_header(
+                "Meeting Details",
+                "Edit lesson assignment and meeting notes for this selected date.",
+            )
             date_col, lesson_col = st.columns([0.95, 1.45])
             with date_col:
                 st.text_input("Date", value=format_meeting_date(selected_meeting_date), disabled=True)
@@ -2162,22 +2604,6 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                             preview = f"{preview} (+{len(selected_lesson_dates) - 2})"
                         st.caption(f"Other dates using this lesson: {preview}")
 
-            people_left, people_right = st.columns(2)
-            with people_left:
-                host_select = st.selectbox(
-                    "Host",
-                    options=dashboard_person_options,
-                    index=dashboard_person_options.index(host_default_selection),
-                    key=f"dashboard_host_select_{selected_id}",
-                )
-            with people_right:
-                facilitator_select = st.selectbox(
-                    "Facilitator",
-                    options=dashboard_person_options,
-                    index=dashboard_person_options.index(facilitator_default_selection),
-                    key=f"dashboard_facilitator_select_{selected_id}",
-                )
-
             selected_notes = st.text_area(
                 "Notes",
                 value=selected_row["notes"],
@@ -2186,11 +2612,8 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                 placeholder="Add logistical notes, prayer focus, or reminders for this date.",
             )
 
-            original_notes = "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
             has_unsaved_changes = (
                 int(lesson_week) != int(lesson_default_week)
-                or str(host_select) != str(host_default_selection)
-                or str(facilitator_select) != str(facilitator_default_selection)
                 or str(selected_notes) != str(original_notes)
             )
 
@@ -2215,61 +2638,33 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                 if not has_unsaved_changes:
                     notify("No meeting detail changes to save.", "info")
                 else:
+                    current_host = str(
+                        st.session_state.get(
+                            f"dashboard_host_select_{selected_id}",
+                            host_default_selection,
+                        )
+                    )
+                    current_facilitator = str(
+                        st.session_state.get(
+                            f"dashboard_facilitator_select_{selected_id}",
+                            facilitator_default_selection,
+                        )
+                    )
+                    current_main_meal = str(
+                        st.session_state.get(
+                            f"dashboard_main_meal_{selected_id}",
+                            saved_main_meal,
+                        )
+                    ).strip()
                     update_upcoming_meeting(
                         selected_id,
                         int(lesson_week),
-                        str(host_select),
-                        str(facilitator_select),
+                        current_host,
+                        current_facilitator,
                         selected_notes,
+                        current_main_meal,
                     )
                     queue_message("Meeting details saved.")
-                    st.rerun()
-
-        with tab_meal:
-            render_section_header(
-                f"Meal Signup ({meal_date_label})",
-                "Capture each family and what they are bringing.",
-            )
-            meal_df = fetch_upcoming_meal_signups(selected_id)
-            original_meal_rows = normalize_meal_rows(meal_df.to_dict(orient="records"))
-            meal_editor_df = st.data_editor(
-                meal_df,
-                hide_index=True,
-                use_container_width=True,
-                num_rows="dynamic",
-                height=194,
-                column_order=["Name", "Dish"],
-                column_config={
-                    "Name": st.column_config.TextColumn("Name", width="medium"),
-                    "Dish": st.column_config.TextColumn("Dish", width="large"),
-                },
-                key=f"dashboard_meal_editor_{selected_id}",
-            )
-            edited_meal_rows = normalize_meal_rows(meal_editor_df.to_dict(orient="records"))
-            meal_has_unsaved_changes = edited_meal_rows != original_meal_rows
-
-            if meal_has_unsaved_changes:
-                st.markdown(
-                    (
-                        "<div class='sg-save-required'>"
-                        "Meal changes are unsaved. Click <b>Save meal list</b>."
-                        "</div>"
-                    ),
-                    unsafe_allow_html=True,
-                )
-
-            if st.button(
-                "Save meal list",
-                key=f"dashboard_save_meal_{selected_id}",
-                use_container_width=True,
-            ):
-                if not meal_has_unsaved_changes:
-                    notify("No meal list changes to save.", "info")
-                else:
-                    saved_entries = save_upcoming_meal_signups(
-                        selected_id, meal_editor_df.to_dict(orient="records")
-                    )
-                    queue_message(f"Meal list saved ({saved_entries} entries).")
                     st.rerun()
 
         with tab_complete:
