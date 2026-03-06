@@ -636,6 +636,28 @@ def inject_global_styles() -> None:
             font-size: 0.86rem;
             max-width: 60ch;
         }
+        .sg-selection-summary {
+            margin: 0.4rem 0 0.25rem 0;
+            padding: 0.58rem 0.7rem;
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius-md);
+            background: var(--sg-surface-muted);
+        }
+        .sg-selection-summary-title {
+            margin: 0;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-selection-summary-value {
+            margin: 0.22rem 0 0 0;
+            color: var(--sg-text);
+            font-size: 0.95rem;
+            font-weight: 620;
+            line-height: 1.3;
+        }
         .sg-lesson-rolodex-scroll {
             display: flex;
             gap: 0.56rem;
@@ -2010,30 +2032,37 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
         st.session_state["dashboard_selected_upcoming_id"] = date_ids[0]
 
     selected_id = int(st.session_state["dashboard_selected_upcoming_id"])
+    date_rows = upcoming_df.to_dict(orient="records")
+    row_by_id = {int(row["id"]): row for row in date_rows}
 
     with st.container(border=True):
         render_section_header(
             "Upcoming Meeting Dates",
-            "Pick a date to manage details, meal signups, and completion steps below.",
+            "Choose a meeting date. The details panel below always edits the selected date.",
         )
-        date_rows = upcoming_df.to_dict(orient="records")
-        card_columns = 4
-        for row_idx, row in enumerate(date_rows):
-            if row_idx % card_columns == 0:
-                cols = st.columns(card_columns)
-            row_id = int(row["id"])
-            is_selected = row_id == selected_id
-            with cols[row_idx % card_columns]:
-                label_prefix = "Next" if row_idx == 0 else "Upcoming"
-                button_label = f"{label_prefix}: {format_meeting_date(row['meeting_date'])}"
-                if st.button(
-                    button_label,
-                    key=f"dashboard_select_date_{row_id}",
-                    type="primary" if is_selected else "secondary",
-                    use_container_width=True,
-                ):
-                    st.session_state["dashboard_selected_upcoming_id"] = row_id
-                    st.rerun()
+        ordered_ids = [int(row["id"]) for row in date_rows]
+
+        def date_selector_label(row_id: int) -> str:
+            row = row_by_id.get(int(row_id), {})
+            label_prefix = "Next" if ordered_ids and int(row_id) == int(ordered_ids[0]) else "Upcoming"
+            lesson_num = int(row.get("lesson_week", 0)) if row else 0
+            lesson_theme = str(theme_lookup.get(lesson_num, "")).strip()
+            lesson_part = f"Lesson {lesson_num}" if lesson_num else "Lesson"
+            if lesson_theme:
+                lesson_part = f"{lesson_part} - {lesson_theme}"
+            return f"{label_prefix}: {format_meeting_date(str(row.get('meeting_date', '')))} | {lesson_part}"
+
+        selected_index = ordered_ids.index(selected_id) if selected_id in ordered_ids else 0
+        picked_id = st.selectbox(
+            "Selected meeting date",
+            options=ordered_ids,
+            index=selected_index,
+            format_func=date_selector_label,
+            key="dashboard_upcoming_picker",
+        )
+        if int(picked_id) != int(selected_id):
+            st.session_state["dashboard_selected_upcoming_id"] = int(picked_id)
+            st.rerun()
 
         if st.button(
             "Add another meeting date",
@@ -2043,6 +2072,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
             st.session_state["active_page"] = "Admin"
             st.rerun()
 
+    selected_id = int(st.session_state["dashboard_selected_upcoming_id"])
     selected_row = upcoming_df[upcoming_df["id"] == selected_id].iloc[0]
     selected_meeting_date = str(selected_row["meeting_date"])
     try:
@@ -2092,7 +2122,19 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
     with st.container(border=True):
         render_section_header(
             f"Meeting Details: {format_meeting_date(selected_meeting_date)}",
-            "Date management (add/delete) is handled in Admin. Use tabs below to update the selected meeting.",
+            "You are editing the selected meeting date from the section above.",
+        )
+        selected_lesson_theme = str(theme_lookup.get(int(selected_row["lesson_week"]), "")).strip()
+        st.markdown(
+            (
+                "<div class='sg-selection-summary'>"
+                "<p class='sg-selection-summary-title'>Currently Editing</p>"
+                f"<p class='sg-selection-summary-value'>{escape(format_meeting_date(selected_meeting_date))}"
+                f" | Lesson {int(selected_row['lesson_week'])}"
+                f"{escape(' - ' + selected_lesson_theme) if selected_lesson_theme else ''}</p>"
+                "</div>"
+            ),
+            unsafe_allow_html=True,
         )
         tab_details, tab_meal, tab_complete = st.tabs(
             ["Details", "Meal Plan", "Complete"]
