@@ -91,14 +91,6 @@ QUICK_OUTLINE = [
     "Pray and share one next step",
 ]
 
-STATUS_COLORS = {
-    "Done": ("#dbe8f2", "#3f5f87"),
-    "Not done": ("#e8eef4", "#2f394d"),
-    "Skipped": ("#fde5db", "#a6533c"),
-    "Postponed": ("#dbe8ea", "#40606d"),
-}
-
-
 def get_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -307,91 +299,125 @@ def inject_global_styles() -> None:
         """
         <style>
         :root {
-            --sg-blue-dark: #45658c;
-            --sg-blue-mid: #8eb6cd;
-            --sg-blue-light: #bdd9df;
-            --sg-orange: #e96b47;
-            --sg-navy: #2f394d;
-            --sg-bg: #e8eef4;
-            --sg-surface: #f7f9fb;
-            --sg-surface-soft: #edf3f7;
-            --sg-border: #b4c4d2;
-            --sg-border-strong: #95abc0;
-            --sg-text: #273447;
-            --sg-muted: #596d88;
+            --sg-bg: #f3f4f6;
+            --sg-surface: #ffffff;
+            --sg-surface-muted: #f7f8fa;
+            --sg-border: #dddee3;
+            --sg-border-strong: #c8cbd3;
+            --sg-text: #111111;
+            --sg-muted: #424242;
+            --sg-muted-soft: #666666;
+            --sg-primary: #d5d8df;
+            --sg-primary-strong: #c4c9d2;
+            --sg-primary-soft: #eceff4;
+            --sg-success-soft: #eceff2;
+            --sg-success-text: #39424d;
+            --sg-danger-soft: #eceff2;
+            --sg-danger-text: #39424d;
+            --sg-warning-soft: #eceff2;
+            --sg-warning-text: #39424d;
+            --sg-destructive: #8a8f99;
+            --sg-destructive-soft: #eceff2;
+            --sg-radius-sm: 8px;
+            --sg-radius-md: 12px;
+            --sg-radius-lg: 16px;
+            --sg-shadow-sm: 0 1px 2px rgba(48, 38, 34, 0.06);
+            --sg-shadow-md: 0 8px 20px rgba(48, 38, 34, 0.08);
         }
         .stApp {
             background: var(--sg-bg);
             color: var(--sg-text);
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
         }
         section[data-testid="stSidebar"] {
-            background: #dce8f1 !important;
+            background: var(--sg-bg) !important;
             border-right: 1px solid var(--sg-border);
         }
         section[data-testid="stSidebar"] div[data-testid="stSidebarContent"] {
-            background: #dce8f1 !important;
-            color: var(--sg-navy);
+            background: var(--sg-bg) !important;
+            color: var(--sg-text);
+        }
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] .stCaption {
+            color: var(--sg-text) !important;
         }
         .main .block-container {
-            max-width: 1260px;
-            padding-top: 0.9rem;
-            padding-bottom: 1.8rem;
+            max-width: 1200px;
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
         h1, h2, h3 {
-            color: var(--sg-navy);
+            color: var(--sg-text);
             letter-spacing: 0.01em;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-weight: 700;
+            font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+            font-weight: 600;
         }
-        h1 { font-size: 1.85rem; }
-        h2 { font-size: 1.45rem; }
-        h3 { font-size: 1.12rem; }
+        h1 { font-size: 1.9rem; }
+        h2 { font-size: 1.35rem; }
+        h3 { font-size: 1.08rem; }
+        .stMarkdown, p, li, label, span {
+            color: var(--sg-text);
+        }
         .stMarkdown p {
-            margin-bottom: 0.45rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.45;
         }
         hr {
             border-color: var(--sg-border);
-            margin: 0.45rem 0 0.85rem 0;
+            margin: 0.7rem 0 1rem 0;
         }
         div[data-testid="stVerticalBlockBorderWrapper"] {
             border: 1px solid var(--sg-border);
-            border-radius: 14px;
+            border-radius: var(--sg-radius-lg);
             background: var(--sg-surface);
-            box-shadow: 0 1px 0 rgba(47, 57, 77, 0.06);
+            box-shadow: var(--sg-shadow-sm);
+        }
+        div[data-testid="stVerticalBlockBorderWrapper"] > div {
+            padding: 0.1rem;
         }
         div[data-testid="stMetric"] {
-            background: var(--sg-surface-soft);
+            background: var(--sg-surface-muted);
             border: 1px solid var(--sg-border);
-            border-radius: 12px;
-            padding: 0.4rem 0.65rem;
+            border-radius: var(--sg-radius-md);
+            padding: 0.55rem 0.75rem;
         }
         div[data-testid="stMetricLabel"] {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--sg-muted);
+            letter-spacing: 0.07em;
+            color: var(--sg-muted-soft);
             font-weight: 700;
         }
         div[data-testid="stMetricValue"] {
-            color: var(--sg-blue-dark);
-            font-weight: 700;
+            color: var(--sg-text);
+            font-size: 1.45rem;
+            font-weight: 650;
         }
         div[data-testid="stDataEditor"] {
             border: 1px solid var(--sg-border);
-            border-radius: 12px;
-            padding: 0.2rem;
+            border-radius: var(--sg-radius-md);
+            padding: 0.2rem 0.28rem;
             background: var(--sg-surface);
+        }
+        div[data-testid="stDataFrame"] {
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius-md);
         }
         div[data-testid="stDateInput"] label,
         div[data-testid="stSelectbox"] label,
         div[data-testid="stTextInput"] label,
         div[data-testid="stTextArea"] label,
-        div[data-testid="stRadio"] label {
-            font-size: 0.74rem;
-            letter-spacing: 0.08em;
+        div[data-testid="stRadio"] label,
+        div[data-testid="stFileUploader"] label {
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            color: var(--sg-muted);
+            color: var(--sg-muted-soft);
             font-weight: 700;
         }
         div[data-baseweb="select"] > div,
@@ -399,8 +425,9 @@ def inject_global_styles() -> None:
         div[data-baseweb="textarea"] > div {
             background: var(--sg-surface) !important;
             border: 1px solid var(--sg-border) !important;
-            border-radius: 10px !important;
+            border-radius: var(--sg-radius-sm) !important;
             box-shadow: none !important;
+            min-height: 2.55rem;
         }
         div[data-baseweb="select"] > div:hover,
         div[data-baseweb="input"] > div:hover,
@@ -410,8 +437,8 @@ def inject_global_styles() -> None:
         div[data-baseweb="select"] > div:focus-within,
         div[data-baseweb="input"] > div:focus-within,
         div[data-baseweb="textarea"] > div:focus-within {
-            border-color: var(--sg-blue-dark) !important;
-            box-shadow: 0 0 0 1px var(--sg-blue-dark) !important;
+            border-color: var(--sg-primary) !important;
+            box-shadow: 0 0 0 1px var(--sg-primary-soft) !important;
         }
         div[data-baseweb="select"] * {
             color: var(--sg-text) !important;
@@ -425,191 +452,344 @@ def inject_global_styles() -> None:
             color: var(--sg-text) !important;
         }
         div[data-baseweb="popover"] [role="option"][aria-selected="true"] {
-            background: var(--sg-blue-light) !important;
+            background: var(--sg-primary-soft) !important;
         }
         div[data-baseweb="popover"] [role="option"]:hover {
-            background: #dce8f1 !important;
+            background: var(--sg-surface-muted) !important;
         }
-        .stButton > button, .stDownloadButton > button, .stFormSubmitButton > button {
-            border-radius: 10px;
+        .stButton > button,
+        .stDownloadButton > button,
+        .stFormSubmitButton > button {
+            border-radius: var(--sg-radius-sm);
             border: 1px solid var(--sg-border);
-            padding: 0.34rem 0.62rem;
+            padding: 0.45rem 0.82rem;
+            min-height: 2.4rem;
             font-weight: 600;
-            background: var(--sg-surface-soft);
+            letter-spacing: 0.01em;
+            background: #ffffff;
             color: var(--sg-text);
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            box-shadow: none;
+            transition: all 120ms ease;
+            font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
         }
-        .stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] {
-            background: var(--sg-blue-dark) !important;
-            border-color: var(--sg-blue-dark) !important;
-            color: #ffffff !important;
+        .stButton > button[kind="primary"],
+        .stFormSubmitButton > button[kind="primary"] {
+            background: var(--sg-primary) !important;
+            border-color: var(--sg-border-strong) !important;
+            color: var(--sg-text) !important;
         }
-        .stButton > button[kind="primary"]:hover, .stFormSubmitButton > button[kind="primary"]:hover {
-            background: var(--sg-navy) !important;
-            border-color: var(--sg-navy) !important;
-            color: #ffffff !important;
+        .stButton > button[kind="primary"]:hover,
+        .stFormSubmitButton > button[kind="primary"]:hover {
+            background: var(--sg-primary-strong) !important;
+            border-color: #b8bdc7 !important;
+            color: var(--sg-text) !important;
+            transform: translateY(-1px);
         }
-        .stButton > button:hover, .stFormSubmitButton > button:hover {
-            border-color: var(--sg-blue-dark);
-            color: var(--sg-navy);
+        .stButton > button:hover,
+        .stDownloadButton > button:hover,
+        .stFormSubmitButton > button:hover {
+            border-color: var(--sg-border-strong);
+            background: var(--sg-surface-muted);
         }
         .stCaption {
             color: var(--sg-muted);
-            font-size: 0.78rem;
+            font-size: 0.79rem;
+        }
+        div[data-testid="stAlert"] {
+            border-radius: var(--sg-radius-md);
+            border: 1px solid var(--sg-border);
+            background: var(--sg-surface-muted);
+        }
+        div[data-baseweb="tab-list"] {
+            gap: 0.45rem;
+            margin: 0.4rem 0 0.95rem 0;
+            border-bottom: none;
+            padding: 0.2rem 0;
+        }
+        button[data-baseweb="tab"] {
+            border: 1px solid var(--sg-border) !important;
+            border-radius: var(--sg-radius-sm) !important;
+            padding: 0.38rem 0.64rem !important;
+            font-size: 0.84rem !important;
+            font-weight: 600 !important;
+            color: var(--sg-muted) !important;
+            background: var(--sg-surface-muted) !important;
+        }
+        button[data-baseweb="tab"][aria-selected="true"] {
+            border-color: var(--sg-border-strong) !important;
+            background: var(--sg-surface) !important;
+            color: var(--sg-text) !important;
+        }
+        div[data-baseweb="tab-highlight"] {
+            background: transparent !important;
+        }
+        .sg-page-header {
+            margin: 0.2rem 0 1rem 0;
+            padding: 0.95rem 1rem;
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius-lg);
+            background: var(--sg-surface);
+            box-shadow: var(--sg-shadow-sm);
+        }
+        .sg-page-eyebrow {
+            margin: 0 0 0.25rem 0;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-page-title {
+            margin: 0;
+            font-size: 1.48rem;
+            font-weight: 650;
+            line-height: 1.2;
+            color: var(--sg-text);
+        }
+        .sg-page-subtitle {
+            margin: 0.28rem 0 0 0;
+            color: var(--sg-muted);
+            font-size: 0.92rem;
+            line-height: 1.4;
+        }
+        .sg-section-header {
+            margin: 0.15rem 0 0.6rem 0;
+        }
+        .sg-section-title {
+            margin: 0;
+            font-size: 1.02rem;
+            font-weight: 640;
+            color: var(--sg-text);
+            line-height: 1.35;
+        }
+        .sg-section-description {
+            margin: 0.2rem 0 0 0;
+            color: var(--sg-muted);
+            font-size: 0.84rem;
+            line-height: 1.38;
+        }
+        .sg-inline-nav-title {
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+            margin: 0;
+        }
+        .sg-status-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.22rem 0.56rem;
+            font-size: 0.75rem;
+            font-weight: 650;
+            border: 1px solid transparent;
+        }
+        .sg-status-badge-done {
+            background: var(--sg-success-soft);
+            color: var(--sg-success-text);
+            border-color: #d4d9df;
+        }
+        .sg-status-badge-notdone {
+            background: var(--sg-surface-muted);
+            color: var(--sg-muted);
+            border-color: var(--sg-border);
+        }
+        .sg-status-badge-skipped {
+            background: var(--sg-danger-soft);
+            color: var(--sg-danger-text);
+            border-color: #d4d9df;
+        }
+        .sg-status-badge-postponed {
+            background: var(--sg-warning-soft);
+            color: var(--sg-warning-text);
+            border-color: #d4d9df;
+        }
+        .sg-save-required,
+        .sg-action-alert {
+            border-radius: var(--sg-radius-sm);
+            font-size: 0.81rem;
+            font-weight: 600;
+            padding: 0.5rem 0.66rem;
+            margin: 0.28rem 0 0.6rem 0;
+            border: 1px solid #d8dbe1;
+            background: #f1f3f6;
+            color: #3f454d;
+        }
+        .sg-empty-state {
+            border: 1px dashed var(--sg-border-strong);
+            border-radius: var(--sg-radius-md);
+            background: var(--sg-surface-muted);
+            padding: 1.15rem 0.9rem;
+            text-align: left;
+            margin-top: 0.2rem;
+        }
+        .sg-empty-state-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 640;
+            color: var(--sg-text);
+        }
+        .sg-empty-state-description {
+            margin: 0.32rem 0 0 0;
+            color: var(--sg-muted);
+            font-size: 0.86rem;
+            max-width: 60ch;
         }
         .sg-lesson-rolodex-scroll {
             display: flex;
-            gap: 0.48rem;
+            gap: 0.56rem;
             overflow-x: auto;
             overflow-y: hidden;
-            padding: 0.16rem 0.1rem 0.45rem 0.05rem;
+            padding: 0.22rem 0.08rem 0.58rem 0.04rem;
             scrollbar-width: thin;
         }
         .sg-lesson-rolodex-scroll::-webkit-scrollbar {
             height: 8px;
         }
         .sg-lesson-rolodex-scroll::-webkit-scrollbar-thumb {
-            background: var(--sg-blue-mid);
+            background: #b8bac1;
             border-radius: 999px;
         }
         .sg-lesson-card {
-            min-width: 148px;
-            max-width: 166px;
+            min-width: 156px;
+            max-width: 186px;
             border: 1px solid var(--sg-border);
-            border-radius: 11px;
-            background: var(--sg-surface-soft);
+            border-radius: var(--sg-radius-md);
+            background: var(--sg-surface);
             color: var(--sg-text) !important;
             text-decoration: none !important;
-            padding: 0.42rem 0.52rem;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+            padding: 0.54rem 0.56rem;
+            box-shadow: var(--sg-shadow-sm);
             flex: 0 0 auto;
+            transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
         }
         .sg-lesson-card:hover {
             border-color: var(--sg-border-strong);
-            background: #e2ebf2;
+            transform: translateY(-1px);
+            box-shadow: var(--sg-shadow-md);
         }
         .sg-lesson-card.selected {
-            background: var(--sg-navy);
-            border-color: var(--sg-navy);
-            color: #f2f6fb !important;
+            background: var(--sg-primary-soft);
+            border-color: var(--sg-primary);
+            color: var(--sg-text) !important;
         }
         .sg-lesson-card-title {
-            font-size: 0.82rem;
-            font-weight: 700;
+            font-size: 0.81rem;
+            font-weight: 630;
             line-height: 1.2;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .sg-lesson-card-status {
-            font-size: 0.7rem;
+            font-size: 0.69rem;
             letter-spacing: 0.06em;
             text-transform: uppercase;
-            margin-top: 0.28rem;
-            opacity: 0.82;
-        }
-        .sg-save-required {
-            background: #fde6dc;
-            border: 1px solid #e1a793;
-            border-radius: 10px;
-            color: #7a3f2d;
-            font-size: 0.82rem;
-            font-weight: 700;
-            padding: 0.42rem 0.58rem;
-            margin: 0.15rem 0 0.52rem 0;
-        }
-        .sg-action-alert {
-            background: #fde6dc;
-            border: 1px solid #e1a793;
-            border-radius: 10px;
-            color: #7a3f2d;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 0.34rem 0.52rem;
-            margin: 0.2rem 0 0.45rem 0;
-        }
-        .sg-inline-nav-title {
-            font-size: 0.73rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--sg-muted);
-            font-weight: 700;
-            margin: 0 0 0.22rem 0;
+            margin-top: 0.32rem;
+            opacity: 0.8;
         }
         .sg-lesson-status-line {
-            margin: -0.18rem 0 0.55rem 0;
+            margin: 0.1rem 0 0.6rem 0;
         }
         .sg-lesson-title {
-            font-size: 1.26rem;
-            font-weight: 700;
-            line-height: 1.14;
-            color: var(--sg-navy);
-            margin: 0.04rem 0 0.2rem 0;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 1.3rem;
+            font-weight: 650;
+            line-height: 1.2;
+            color: var(--sg-text);
+            margin: 0.02rem 0 0.1rem 0;
+            font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
         }
         .sg-lesson-section {
             border: 1px solid var(--sg-border);
-            border-radius: 10px;
+            border-radius: var(--sg-radius-md);
             background: var(--sg-surface);
-            padding: 0.44rem 0.58rem;
-            margin: 0.28rem 0;
+            padding: 0.62rem 0.75rem;
+            margin: 0.38rem 0;
         }
         .sg-lesson-section-title {
-            font-size: 0.71rem;
-            letter-spacing: 0.08em;
+            font-size: 0.69rem;
+            letter-spacing: 0.07em;
             text-transform: uppercase;
-            color: var(--sg-muted);
+            color: var(--sg-muted-soft);
             font-weight: 700;
-            margin: 0 0 0.18rem 0;
+            margin: 0 0 0.26rem 0;
         }
         .sg-lesson-subsection-title {
-            font-size: 0.74rem;
-            letter-spacing: 0.08em;
+            font-size: 0.7rem;
+            letter-spacing: 0.07em;
             text-transform: uppercase;
-            color: var(--sg-muted);
+            color: var(--sg-muted-soft);
             font-weight: 700;
-            margin: 0.42rem 0 0.2rem 0;
+            margin: 0.62rem 0 0.24rem 0;
         }
         .sg-lesson-summary {
             color: var(--sg-text);
-            font-size: 1rem;
-            line-height: 1.35;
-            margin-bottom: 0.14rem;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            margin-bottom: 0.1rem;
         }
         .sg-lesson-big-idea {
             color: var(--sg-text);
-            font-size: 1rem;
-            line-height: 1.35;
+            font-size: 0.95rem;
+            line-height: 1.45;
             margin-bottom: 0.02rem;
         }
         .sg-anchor-ref {
-            font-size: 0.99rem;
-            color: var(--sg-navy);
+            font-size: 0.94rem;
+            color: var(--sg-text);
             margin-bottom: 0.05rem;
         }
         .sg-tight-link {
-            font-size: 0.77rem;
-            margin: 0.02rem 0 0.05rem 0;
+            font-size: 0.78rem;
+            margin: 0.05rem 0 0.05rem 0;
         }
         .sg-tight-link a {
-            color: var(--sg-blue-dark);
+            color: var(--sg-primary-strong);
             text-decoration: underline;
         }
         .sg-outline {
-            line-height: 1.31;
+            line-height: 1.42;
             color: var(--sg-text);
             font-size: 0.9rem;
         }
         .sg-outline ul {
-            margin: 0.04rem 0 0.2rem 0.9rem;
-            padding-left: 0.5rem;
+            margin: 0.05rem 0 0.26rem 0.95rem;
+            padding-left: 0.52rem;
         }
         .sg-outline li {
-            margin-bottom: 0.1rem;
+            margin-bottom: 0.16rem;
         }
         .sg-outline-level {
-            font-weight: 600;
-            color: var(--sg-navy);
+            font-weight: 620;
+            color: var(--sg-text);
+        }
+        .sg-sidebar-brand {
+            margin: 0.15rem 0 0.75rem 0;
+            padding: 0.65rem 0.72rem;
+            border: 1px solid var(--sg-border-strong);
+            border-radius: var(--sg-radius-md);
+            background: var(--sg-surface);
+        }
+        .sg-sidebar-title {
+            margin: 0;
+            color: var(--sg-text);
+            font-size: 0.98rem;
+            font-weight: 640;
+        }
+        .sg-sidebar-subtitle {
+            margin: 0.35rem 0 0 0;
+            color: var(--sg-muted);
+            font-size: 0.78rem;
+            line-height: 1.38;
+        }
+        .sg-sidebar-section {
+            margin: 0.95rem 0 0.35rem 0;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
         }
         div[data-testid="stRadio"] div[role="radiogroup"] {
             gap: 0.5rem 0.85rem;
@@ -619,19 +799,19 @@ def inject_global_styles() -> None:
             .main .block-container {
                 max-width: 100%;
                 padding-top: 0.55rem;
-                padding-left: 0.6rem;
-                padding-right: 0.6rem;
-                padding-bottom: 1.25rem;
+                padding-left: 0.7rem;
+                padding-right: 0.7rem;
+                padding-bottom: 1.3rem;
             }
-            h1 { font-size: 1.45rem; }
-            h2 { font-size: 1.22rem; }
+            h1 { font-size: 1.52rem; }
+            h2 { font-size: 1.16rem; }
             h3 { font-size: 1.0rem; }
-            .stMarkdown p { margin-bottom: 0.36rem; }
+            .stMarkdown p { margin-bottom: 0.44rem; }
             div[data-testid="stVerticalBlockBorderWrapper"] {
-                border-radius: 11px;
+                border-radius: var(--sg-radius-md);
             }
             div[data-testid="stHorizontalBlock"] {
-                gap: 0.48rem !important;
+                gap: 0.6rem !important;
                 flex-wrap: wrap;
             }
             div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
@@ -639,25 +819,27 @@ def inject_global_styles() -> None:
                 width: 100% !important;
                 min-width: 0 !important;
             }
-            .stButton > button, .stDownloadButton > button, .stFormSubmitButton > button {
-                min-height: 2.2rem;
-                font-size: 0.92rem;
-                padding: 0.36rem 0.58rem;
+            .stButton > button,
+            .stDownloadButton > button,
+            .stFormSubmitButton > button {
+                min-height: 2.28rem;
+                font-size: 0.88rem;
+                padding: 0.36rem 0.62rem;
             }
             .stCaption {
-                font-size: 0.74rem;
+                font-size: 0.75rem;
             }
             .sg-lesson-rolodex-scroll {
-                gap: 0.36rem;
-                padding: 0.08rem 0.05rem 0.34rem 0.03rem;
+                gap: 0.42rem;
+                padding: 0.08rem 0.05rem 0.38rem 0.02rem;
             }
             .sg-lesson-card {
-                min-width: 130px;
-                max-width: 145px;
-                padding: 0.34rem 0.4rem;
+                min-width: 132px;
+                max-width: 148px;
+                padding: 0.4rem 0.42rem;
             }
             .sg-lesson-card-title {
-                font-size: 0.76rem;
+                font-size: 0.74rem;
             }
             .sg-lesson-card-status {
                 font-size: 0.62rem;
@@ -667,11 +849,11 @@ def inject_global_styles() -> None:
                 font-size: 0.77rem;
             }
             .sg-lesson-title {
-                font-size: 1.12rem;
+                font-size: 1.08rem;
             }
             .sg-lesson-section {
-                padding: 0.38rem 0.48rem;
-                margin: 0.22rem 0;
+                padding: 0.52rem 0.58rem;
+                margin: 0.3rem 0;
             }
             .sg-lesson-section-title,
             .sg-lesson-subsection-title {
@@ -679,32 +861,38 @@ def inject_global_styles() -> None:
             }
             .sg-lesson-summary,
             .sg-lesson-big-idea {
-                font-size: 0.94rem;
+                font-size: 0.9rem;
             }
             .sg-tight-link {
-                font-size: 0.75rem;
+                font-size: 0.74rem;
             }
             .sg-outline {
-                font-size: 0.88rem;
+                font-size: 0.86rem;
+            }
+            .sg-page-header {
+                padding: 0.75rem 0.78rem;
+            }
+            .sg-page-title {
+                font-size: 1.24rem;
             }
             section[data-testid="stSidebar"] .stButton > button {
-                min-height: 2.05rem;
+                min-height: 2.12rem;
             }
         }
         @media (max-width: 640px) {
             .main .block-container {
-                padding-left: 0.45rem;
-                padding-right: 0.45rem;
-                padding-bottom: 1rem;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                padding-bottom: 1.1rem;
             }
-            h1 { font-size: 1.3rem; }
+            h1 { font-size: 1.26rem; }
             h2 { font-size: 1.12rem; }
             h3 { font-size: 0.95rem; }
             div[data-testid="stMetricLabel"] {
                 font-size: 0.66rem;
             }
             div[data-testid="stMetricValue"] {
-                font-size: 1.35rem;
+                font-size: 1.22rem;
             }
             div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
                 flex: 1 1 100% !important;
@@ -713,27 +901,15 @@ def inject_global_styles() -> None:
                 min-width: 118px;
                 max-width: 132px;
             }
+            .sg-page-title {
+                font-size: 1.16rem;
+            }
+            .sg-page-subtitle {
+                font-size: 0.85rem;
+            }
         }
         </style>
         """,
-        unsafe_allow_html=True,
-    )
-
-
-def inject_title_font_styles() -> None:
-    font_stack = '"Helvetica Neue", Helvetica, Arial, sans-serif'
-
-    st.markdown(
-        (
-            "<style>"
-            f":root {{ --sg-title-font: {font_stack}; }}"
-            "h1, h2, h3, .sg-lesson-title { "
-            "font-family: var(--sg-title-font) !important; "
-            "font-weight: 700 !important; "
-            "letter-spacing: 0.012em; "
-            "}"
-            "</style>"
-        ),
         unsafe_allow_html=True,
     )
 
@@ -1652,11 +1828,65 @@ def reset_database_data() -> None:
 
 
 def render_status_badge(status: str) -> str:
-    bg, fg = STATUS_COLORS.get(status, STATUS_COLORS["Not done"])
-    return (
-        f"<span style='background-color:{bg};color:{fg};"
-        "padding:0.2rem 0.6rem;border-radius:999px;font-weight:600;font-size:0.8rem;'>"
-        f"{status}</span>"
+    class_lookup = {
+        "Done": "sg-status-badge-done",
+        "Not done": "sg-status-badge-notdone",
+        "Skipped": "sg-status-badge-skipped",
+        "Postponed": "sg-status-badge-postponed",
+    }
+    css_class = class_lookup.get(status, "sg-status-badge-notdone")
+    return f"<span class='sg-status-badge {css_class}'>{escape(status)}</span>"
+
+
+def render_page_header(
+    title: str,
+    subtitle: str,
+    eyebrow: str = "",
+) -> None:
+    eyebrow_html = (
+        f"<div class='sg-page-eyebrow'>{escape(eyebrow)}</div>" if str(eyebrow).strip() else ""
+    )
+    st.markdown(
+        (
+            "<div class='sg-page-header'>"
+            f"{eyebrow_html}"
+            f"<h1 class='sg-page-title'>{escape(title)}</h1>"
+            f"<p class='sg-page-subtitle'>{escape(subtitle)}</p>"
+            "</div>"
+        ),
+        unsafe_allow_html=True,
+    )
+
+
+def render_section_header(
+    title: str,
+    description: str = "",
+) -> None:
+    desc_html = (
+        f"<p class='sg-section-description'>{escape(description)}</p>"
+        if str(description).strip()
+        else ""
+    )
+    st.markdown(
+        (
+            "<div class='sg-section-header'>"
+            f"<h3 class='sg-section-title'>{escape(title)}</h3>"
+            f"{desc_html}"
+            "</div>"
+        ),
+        unsafe_allow_html=True,
+    )
+
+
+def render_empty_state(title: str, description: str) -> None:
+    st.markdown(
+        (
+            "<div class='sg-empty-state'>"
+            f"<p class='sg-empty-state-title'>{escape(title)}</p>"
+            f"<p class='sg-empty-state-description'>{escape(description)}</p>"
+            "</div>"
+        ),
+        unsafe_allow_html=True,
     )
 
 
@@ -1704,7 +1934,7 @@ def get_lesson_unit_overview(
 
 def render_inline_navigation(pages: List[str]) -> None:
     with st.container(border=True):
-        st.markdown("<div class='sg-inline-nav-title'>Navigation</div>", unsafe_allow_html=True)
+        st.markdown("<div class='sg-inline-nav-title'>Pages</div>", unsafe_allow_html=True)
         nav_cols = st.columns(len(pages))
         active_page = str(st.session_state.get("active_page", "Home"))
         for idx, nav_page in enumerate(pages):
@@ -1719,8 +1949,6 @@ def render_inline_navigation(pages: List[str]) -> None:
 
 
 def render_dashboard(lessons_df: pd.DataFrame) -> None:
-    st.header("MCOC Small Group")
-
     status_map = derive_status_map(lessons_df)
     weeks = lessons_df["week"].astype(int).tolist()
     theme_lookup = lessons_df.set_index("week")["theme"].to_dict()
@@ -1752,9 +1980,24 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
         else (suggested_week if suggested_week is not None else weeks[0])
     )
 
+    render_page_header(
+        "MCOC Small Group",
+        "Plan meetings, assign roles, coordinate meals, and log completion from one place.",
+        "Home",
+    )
+
     if upcoming_df.empty:
-        st.info("No upcoming meeting dates yet. Add dates from Admin.")
-        if st.button("Add a new Meeting", key="dashboard_go_admin_empty", type="primary"):
+        with st.container(border=True):
+            render_empty_state(
+                "No upcoming meetings scheduled",
+                "Create your next meeting date in Admin. Once added, it will appear here for assignment and completion tracking.",
+            )
+        if st.button(
+            "Add your first meeting",
+            key="dashboard_go_admin_empty",
+            type="primary",
+            use_container_width=True,
+        ):
             st.session_state["active_page"] = "Admin"
             st.rerun()
         return
@@ -1769,8 +2012,10 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
     selected_id = int(st.session_state["dashboard_selected_upcoming_id"])
 
     with st.container(border=True):
-        st.markdown("#### Active Meeting Dates")
-        st.caption("Click a date to switch meeting details below.")
+        render_section_header(
+            "Upcoming Meeting Dates",
+            "Pick a date to manage details, meal signups, and completion steps below.",
+        )
         date_rows = upcoming_df.to_dict(orient="records")
         card_columns = 4
         for row_idx, row in enumerate(date_rows):
@@ -1791,7 +2036,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                     st.rerun()
 
         if st.button(
-            "Add a new Meeting",
+            "Add another meeting date",
             key="dashboard_go_admin_add_meeting",
             use_container_width=True,
         ):
@@ -1845,157 +2090,204 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
         return base
 
     with st.container(border=True):
-        st.markdown("#### Meeting Details")
-        st.caption("Meeting date admin (add/delete) is on the Admin page.")
-        date_col, lesson_col = st.columns([0.95, 1.45])
-        with date_col:
-            st.text_input("Date", value=format_meeting_date(selected_meeting_date), disabled=True)
-        with lesson_col:
-            lesson_week = st.selectbox(
-                "Lesson",
-                options=weeks,
-                index=weeks.index(lesson_default_week),
-                format_func=lesson_option_label,
-                key=f"dashboard_lesson_select_{selected_id}",
-                on_change=mark_state_true,
-                args=(lesson_touch_key,),
-            )
-            if st.session_state.get(lesson_touch_key, False):
-                selected_lesson_dates = scheduled_dates_by_week.get(int(lesson_week), [])
-                if selected_lesson_dates:
-                    preview = ", ".join(selected_lesson_dates[:2])
-                    if len(selected_lesson_dates) > 2:
-                        preview = f"{preview} (+{len(selected_lesson_dates) - 2})"
-                    st.caption(f"Lesson date: {preview}")
-
-        people_left, people_right = st.columns(2)
-        with people_left:
-            host_select = st.selectbox(
-                "Host",
-                options=dashboard_person_options,
-                index=dashboard_person_options.index(host_default_selection),
-                key=f"dashboard_host_select_{selected_id}",
-            )
-        with people_right:
-            facilitator_select = st.selectbox(
-                "Facilitator",
-                options=dashboard_person_options,
-                index=dashboard_person_options.index(facilitator_default_selection),
-                key=f"dashboard_facilitator_select_{selected_id}",
-            )
-
-        selected_notes = st.text_area(
-            "Notes",
-            value=selected_row["notes"],
-            key=f"dashboard_notes_{selected_id}",
-            height=62,
+        render_section_header(
+            f"Meeting Details: {format_meeting_date(selected_meeting_date)}",
+            "Date management (add/delete) is handled in Admin. Use tabs below to update the selected meeting.",
+        )
+        tab_details, tab_meal, tab_complete = st.tabs(
+            ["Details", "Meal Plan", "Complete"]
         )
 
-        original_notes = "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
-        has_unsaved_changes = (
-            int(lesson_week) != int(lesson_default_week)
-            or str(host_select) != str(host_default_selection)
-            or str(facilitator_select) != str(facilitator_default_selection)
-            or str(selected_notes) != str(original_notes)
-        )
-
-        if has_unsaved_changes:
-            st.markdown(
-                (
-                    "<div class='sg-save-required'>"
-                    "Changes are not stored automatically. Click <b>Save Meeting Details</b> to keep updates."
-                    "</div>"
-                ),
-                unsafe_allow_html=True,
-            )
-
-        save_date_details = st.button(
-            "Save Meeting Details",
-            key=f"dashboard_save_date_details_{selected_id}",
-            type="primary",
-            use_container_width=True,
-        )
-
-        if save_date_details:
-            if not has_unsaved_changes:
-                notify("No meeting detail changes to save.", "info")
-            else:
-                update_upcoming_meeting(
-                    selected_id,
-                    int(lesson_week),
-                    str(host_select),
-                    str(facilitator_select),
-                    selected_notes,
+        with tab_details:
+            date_col, lesson_col = st.columns([0.95, 1.45])
+            with date_col:
+                st.text_input("Date", value=format_meeting_date(selected_meeting_date), disabled=True)
+            with lesson_col:
+                lesson_week = st.selectbox(
+                    "Lesson",
+                    options=weeks,
+                    index=weeks.index(lesson_default_week),
+                    format_func=lesson_option_label,
+                    key=f"dashboard_lesson_select_{selected_id}",
+                    on_change=mark_state_true,
+                    args=(lesson_touch_key,),
                 )
-                queue_message("Meeting details saved.")
-                st.rerun()
+                if st.session_state.get(lesson_touch_key, False):
+                    selected_lesson_dates = scheduled_dates_by_week.get(int(lesson_week), [])
+                    if selected_lesson_dates:
+                        preview = ", ".join(selected_lesson_dates[:2])
+                        if len(selected_lesson_dates) > 2:
+                            preview = f"{preview} (+{len(selected_lesson_dates) - 2})"
+                        st.caption(f"Other dates using this lesson: {preview}")
 
-        st.markdown(f"##### Meal: Add Name and Dish for the {meal_date_label} meal.")
-        meal_df = fetch_upcoming_meal_signups(selected_id)
-        original_meal_rows = normalize_meal_rows(meal_df.to_dict(orient="records"))
-        meal_editor_df = st.data_editor(
-            meal_df,
-            hide_index=True,
-            use_container_width=True,
-            num_rows="dynamic",
-            height=144,
-            column_order=["Name", "Dish"],
-            column_config={
-                "Name": st.column_config.TextColumn("Name", width="medium"),
-                "Dish": st.column_config.TextColumn("Dish", width="large"),
-            },
-            key=f"dashboard_meal_editor_{selected_id}",
-        )
-        edited_meal_rows = normalize_meal_rows(meal_editor_df.to_dict(orient="records"))
-        meal_has_unsaved_changes = edited_meal_rows != original_meal_rows
-
-        if meal_has_unsaved_changes:
-            st.markdown(
-                (
-                    "<div class='sg-save-required'>"
-                    "Meal list changes are not saved yet. Click <b>Save meal list</b>."
-                    "</div>"
-                ),
-                unsafe_allow_html=True,
-            )
-
-        if st.button(
-            "Save meal list",
-            key=f"dashboard_save_meal_{selected_id}",
-            use_container_width=True,
-        ):
-            if not meal_has_unsaved_changes:
-                notify("No meal list changes to save.", "info")
-            else:
-                saved_entries = save_upcoming_meal_signups(
-                    selected_id, meal_editor_df.to_dict(orient="records")
+            people_left, people_right = st.columns(2)
+            with people_left:
+                host_select = st.selectbox(
+                    "Host",
+                    options=dashboard_person_options,
+                    index=dashboard_person_options.index(host_default_selection),
+                    key=f"dashboard_host_select_{selected_id}",
                 )
-                queue_message(f"Meal list saved ({saved_entries} entries).")
-                st.rerun()
+            with people_right:
+                facilitator_select = st.selectbox(
+                    "Facilitator",
+                    options=dashboard_person_options,
+                    index=dashboard_person_options.index(facilitator_default_selection),
+                    key=f"dashboard_facilitator_select_{selected_id}",
+                )
 
-        st.markdown("##### Meeting Completion")
-        completion_confirm = st.checkbox(
-            "This meeting has been completed",
-            key=f"dashboard_completion_confirm_{selected_id}",
-        )
-        if st.button(
-            "Log Date Completed",
-            key=f"dashboard_log_date_completed_{selected_id}",
-            type="primary",
-            disabled=not completion_confirm,
-            use_container_width=True,
-        ):
-            add_meeting_log(
-                date.fromisoformat(selected_meeting_date),
-                int(lesson_week),
-                "Completed",
-                selected_notes,
-                host_name=str(host_select),
-                facilitator_name=str(facilitator_select),
+            selected_notes = st.text_area(
+                "Notes",
+                value=selected_row["notes"],
+                key=f"dashboard_notes_{selected_id}",
+                height=96,
+                placeholder="Add logistical notes, prayer focus, or reminders for this date.",
             )
-            st.session_state[f"dashboard_completion_confirm_{selected_id}"] = False
-            queue_message("Meeting logged as completed.")
-            st.rerun()
+
+            original_notes = "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
+            has_unsaved_changes = (
+                int(lesson_week) != int(lesson_default_week)
+                or str(host_select) != str(host_default_selection)
+                or str(facilitator_select) != str(facilitator_default_selection)
+                or str(selected_notes) != str(original_notes)
+            )
+
+            if has_unsaved_changes:
+                st.markdown(
+                    (
+                        "<div class='sg-save-required'>"
+                        "You have unsaved detail changes. Click <b>Save meeting details</b>."
+                        "</div>"
+                    ),
+                    unsafe_allow_html=True,
+                )
+
+            save_date_details = st.button(
+                "Save meeting details",
+                key=f"dashboard_save_date_details_{selected_id}",
+                type="primary",
+                use_container_width=True,
+            )
+
+            if save_date_details:
+                if not has_unsaved_changes:
+                    notify("No meeting detail changes to save.", "info")
+                else:
+                    update_upcoming_meeting(
+                        selected_id,
+                        int(lesson_week),
+                        str(host_select),
+                        str(facilitator_select),
+                        selected_notes,
+                    )
+                    queue_message("Meeting details saved.")
+                    st.rerun()
+
+        with tab_meal:
+            render_section_header(
+                f"Meal Signup ({meal_date_label})",
+                "Capture each family and what they are bringing.",
+            )
+            meal_df = fetch_upcoming_meal_signups(selected_id)
+            original_meal_rows = normalize_meal_rows(meal_df.to_dict(orient="records"))
+            meal_editor_df = st.data_editor(
+                meal_df,
+                hide_index=True,
+                use_container_width=True,
+                num_rows="dynamic",
+                height=194,
+                column_order=["Name", "Dish"],
+                column_config={
+                    "Name": st.column_config.TextColumn("Name", width="medium"),
+                    "Dish": st.column_config.TextColumn("Dish", width="large"),
+                },
+                key=f"dashboard_meal_editor_{selected_id}",
+            )
+            edited_meal_rows = normalize_meal_rows(meal_editor_df.to_dict(orient="records"))
+            meal_has_unsaved_changes = edited_meal_rows != original_meal_rows
+
+            if meal_has_unsaved_changes:
+                st.markdown(
+                    (
+                        "<div class='sg-save-required'>"
+                        "Meal changes are unsaved. Click <b>Save meal list</b>."
+                        "</div>"
+                    ),
+                    unsafe_allow_html=True,
+                )
+
+            if st.button(
+                "Save meal list",
+                key=f"dashboard_save_meal_{selected_id}",
+                use_container_width=True,
+            ):
+                if not meal_has_unsaved_changes:
+                    notify("No meal list changes to save.", "info")
+                else:
+                    saved_entries = save_upcoming_meal_signups(
+                        selected_id, meal_editor_df.to_dict(orient="records")
+                    )
+                    queue_message(f"Meal list saved ({saved_entries} entries).")
+                    st.rerun()
+
+        with tab_complete:
+            render_section_header(
+                "Meeting Completion",
+                "When the meeting finishes, log it here to keep progress and history accurate.",
+            )
+            completion_confirm = st.checkbox(
+                "Confirm this meeting is complete",
+                key=f"dashboard_completion_confirm_{selected_id}",
+            )
+            if st.button(
+                "Log date completed",
+                key=f"dashboard_log_date_completed_{selected_id}",
+                type="primary",
+                disabled=not completion_confirm,
+                use_container_width=True,
+            ):
+                current_lesson_week = int(
+                    st.session_state.get(
+                        f"dashboard_lesson_select_{selected_id}",
+                        lesson_default_week,
+                    )
+                )
+                current_host = str(
+                    st.session_state.get(
+                        f"dashboard_host_select_{selected_id}",
+                        host_default_selection,
+                    )
+                )
+                current_facilitator = str(
+                    st.session_state.get(
+                        f"dashboard_facilitator_select_{selected_id}",
+                        facilitator_default_selection,
+                    )
+                )
+                current_notes = str(
+                    st.session_state.get(
+                        f"dashboard_notes_{selected_id}",
+                        "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"]),
+                    )
+                )
+                try:
+                    completion_date = date.fromisoformat(selected_meeting_date)
+                except ValueError:
+                    notify("Meeting date is invalid; update the date in Admin first.", "error")
+                else:
+                    add_meeting_log(
+                        completion_date,
+                        current_lesson_week,
+                        "Completed",
+                        current_notes,
+                        host_name=current_host,
+                        facilitator_name=current_facilitator,
+                    )
+                    st.session_state[f"dashboard_completion_confirm_{selected_id}"] = False
+                    queue_message("Meeting logged as completed.")
+                    st.rerun()
+
+
 def render_lessons_page(lessons_df: pd.DataFrame) -> None:
     status_map = derive_status_map(lessons_df)
     weeks = lessons_df["week"].astype(int).tolist()
@@ -2014,14 +2306,66 @@ def render_lessons_page(lessons_df: pd.DataFrame) -> None:
         except (TypeError, ValueError):
             scheduled_date_by_week[week] = raw_date
 
-    filtered_weeks = list(weeks)
+    render_page_header(
+        "Lesson Plans",
+        "Browse lessons, review discussion prompts, and keep facilitator notes organized.",
+        "Lessons",
+    )
+    done_count = len([week for week, status in status_map.items() if status == "Done"])
+    scheduled_count = (
+        len(set(upcoming_df["lesson_week"].astype(int).tolist())) if not upcoming_df.empty else 0
+    )
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Total lessons", str(len(weeks)))
+    m2.metric("Completed", str(done_count))
+    m3.metric("Scheduled", str(scheduled_count))
+
+    with st.container(border=True):
+        render_section_header(
+            "Filter Lessons",
+            "Narrow by progress status or search by lesson theme.",
+        )
+        f1, f2 = st.columns([1, 1.6])
+        with f1:
+            status_filter = st.selectbox(
+                "Status",
+                options=["All", "Needs planning", "Scheduled", "Completed"],
+                key="lessons_status_filter",
+            )
+        with f2:
+            theme_search = st.text_input(
+                "Search theme",
+                key="lessons_theme_search",
+                placeholder="Try: Sabbath, Kingdom, Forgiveness...",
+            ).strip()
+
+    filtered_weeks: List[int] = []
+    for week in weeks:
+        status = status_map.get(week, "Not done")
+        is_done = status == "Done"
+        is_scheduled = week in scheduled_date_by_week
+        status_match = True
+        if status_filter == "Needs planning":
+            status_match = (not is_done) and (not is_scheduled)
+        elif status_filter == "Scheduled":
+            status_match = (not is_done) and is_scheduled
+        elif status_filter == "Completed":
+            status_match = is_done
+
+        theme_value = str(theme_lookup.get(week, "")).strip().lower()
+        search_match = (not theme_search) or (theme_search.lower() in theme_value)
+        if status_match and search_match:
+            filtered_weeks.append(int(week))
 
     if not filtered_weeks:
-        st.info("No lessons match this filter.")
+        with st.container(border=True):
+            render_empty_state(
+                "No lessons match your filters",
+                "Try clearing your search term or selecting a different status.",
+            )
         return
 
     next_not_done_week = next((week for week in weeks if status_map.get(week) != "Done"), None)
-
     if (
         "lessons_selected_week" not in st.session_state
         or st.session_state["lessons_selected_week"] not in filtered_weeks
@@ -2044,27 +2388,26 @@ def render_lessons_page(lessons_df: pd.DataFrame) -> None:
         if "lesson_pick" in legacy_params:
             clear_query_param("lesson_pick")
 
-    current_week = int(st.session_state["lessons_selected_week"])
-    selected_week = current_week
+    selected_week = int(st.session_state["lessons_selected_week"])
 
     with st.container(border=True):
-        st.markdown("#### Lesson Plans")
-        st.caption(
-            "Scroll sideways and click a card. Dark card is selected. Lesson Overview is at the bottom of the page."
+        render_section_header(
+            "Lesson Selector",
+            "Scroll sideways and choose a lesson card to open its details.",
         )
         cards_html = ['<div class="sg-lesson-rolodex-scroll">']
         for week in filtered_weeks:
             is_selected = int(week) == int(selected_week)
             theme = str(theme_lookup.get(week, "(Untitled lesson)")).strip()
-            short_theme = theme if len(theme) <= 22 else theme[:19].rstrip() + "..."
+            short_theme = theme if len(theme) <= 24 else theme[:21].rstrip() + "..."
             status_text = status_map.get(week, "Not done")
             if status_text == "Not done" and int(week) in scheduled_date_by_week:
-                status_text = scheduled_date_by_week[int(week)]
+                status_text = f"Scheduled {scheduled_date_by_week[int(week)]}"
             selected_class = " selected" if is_selected else ""
             cards_html.append(
                 f'<a class="sg-lesson-card{selected_class}" href="?lesson_pick={int(week)}" target="_self">'
-                f'<div class="sg-lesson-card-title">#{int(week)} {escape(short_theme)}</div>'
-                f'<div class="sg-lesson-card-status">{escape(status_text)}</div>'
+                f"<div class='sg-lesson-card-title'>Lesson {int(week)}: {escape(short_theme)}</div>"
+                f"<div class='sg-lesson-card-status'>{escape(status_text)}</div>"
                 "</a>"
             )
         cards_html.append("</div>")
@@ -2072,9 +2415,9 @@ def render_lessons_page(lessons_df: pd.DataFrame) -> None:
 
     lesson = lessons_df[lessons_df["week"] == selected_week].iloc[0]
     lesson_status = status_map.get(selected_week, "Not done")
-    verse_ref = lesson["anchor_verse"]
+    verse_ref = str(lesson["anchor_verse"])
     verse_url = f"https://www.biblegateway.com/passage/?search={quote_plus(verse_ref)}"
-    video_url = lesson["video_url"]
+    video_url = str(lesson["video_url"])
     lesson_theme = str(lesson["theme"]).strip()
     big_idea_core = normalize_big_idea_text(
         str(lesson.get("big_idea", "")).strip(),
@@ -2088,173 +2431,191 @@ def render_lessons_page(lessons_df: pd.DataFrame) -> None:
         "anchor_verse": verse_ref,
     }
     effective_questions, _ = get_effective_questions(int(selected_week), lesson_question_context)
+    scheduled_date_label = scheduled_date_by_week.get(int(selected_week), "")
 
     with st.container(border=True):
-        st.markdown(
-            f"<div class='sg-lesson-title'>Lesson {selected_week} - {escape(lesson_theme)}</div>",
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            f"<div class='sg-lesson-status-line'>{render_status_badge(lesson_status)}</div>",
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            (
-                "<div class='sg-lesson-section'>"
-                "<div class='sg-lesson-section-title'>Summary</div>"
-                f"<div class='sg-lesson-summary'>{escape(str(lesson['one_sentence_summary']))}</div>"
-                "</div>"
-            ),
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            (
-                "<div class='sg-lesson-section'>"
-                "<div class='sg-lesson-section-title'>Big Idea</div>"
-                f"<div class='sg-lesson-big-idea'>{escape(big_idea)}</div>"
-                "</div>"
-            ),
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            (
-                "<div class='sg-lesson-section'>"
-                "<div class='sg-lesson-section-title'>Anchor Verse</div>"
-                f"<div class='sg-anchor-ref'>{escape(verse_ref)}</div>"
-                f"<div class='sg-tight-link'><a href='{escape(verse_url + '&version=NIV', quote=True)}' target='_blank'>View verse</a></div>"
-                "</div>"
-            ),
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            (
-                "<div class='sg-lesson-section'>"
-                "<div class='sg-lesson-section-title'>Video</div>"
-                f"<div class='sg-lesson-summary'>{escape(str(lesson['video_name']))}</div>"
-                f"<div class='sg-tight-link'><a href='{escape(video_url, quote=True)}' target='_blank'>{escape(video_url)}</a></div>"
-                "</div>"
-            ),
-            unsafe_allow_html=True,
-        )
-
-        discussion_blocks: List[str] = []
-        for level in QUESTION_LEVELS:
-            questions_html = "".join(
-                f"<li>{escape(question)}</li>" for question in effective_questions[level]
+        left_col, right_col = st.columns([1.55, 1.0])
+        with left_col:
+            st.markdown(
+                f"<div class='sg-lesson-title'>Lesson {selected_week}: {escape(lesson_theme)}</div>",
+                unsafe_allow_html=True,
             )
-            discussion_blocks.append(
-                f"<li><span class='sg-outline-level'>{escape(QUESTION_LABELS[level])}</span><ul>{questions_html}</ul></li>"
+            st.markdown(
+                f"<div class='sg-lesson-status-line'>{render_status_badge(lesson_status)}</div>",
+                unsafe_allow_html=True,
             )
-
-        outline_html = (
-            "<div class='sg-lesson-section'>"
-            "<div class='sg-lesson-section-title'>Quick Outline</div>"
-            "<div class='sg-outline'><ul>"
-            f"<li>{escape(big_idea)}</li>"
-            f"<li>Video: <a href='{escape(video_url, quote=True)}' target='_blank'>{escape(str(lesson['video_name']))}</a></li>"
-            f"<li>Anchor Verse: {escape(verse_ref)}</li>"
-            "<li>Discussion<ul>"
-            f"{''.join(discussion_blocks)}"
-            "</ul></li>"
-            "</ul></div>"
-            "</div>"
-        )
-
-        st.markdown(outline_html, unsafe_allow_html=True)
-
-        st.markdown("<div class='sg-lesson-subsection-title'>Facilitator notes</div>", unsafe_allow_html=True)
-        with st.form(f"facilitator_notes_form_{selected_week}"):
-            notes_text = st.text_area(
-                "Facilitator notes",
-                value=get_lesson_notes(int(selected_week)),
-                height=150,
-                label_visibility="collapsed",
-            )
-            save_notes = st.form_submit_button("Save facilitator notes")
-
-        if save_notes:
-            save_lesson_notes(int(selected_week), notes_text)
-            queue_message(f"Facilitator notes saved for lesson {selected_week}.")
-            st.rerun()
-
-        st.markdown("<div class='sg-lesson-subsection-title'>Lesson completion</div>", unsafe_allow_html=True)
-        if st.button("Completed", type="primary", use_container_width=True, key=f"lesson_completed_{selected_week}"):
-            add_meeting_log(date.today(), int(selected_week), "Completed", "Marked completed from Lessons page")
-
-            updated_done_weeks = get_done_weeks()
-            updated_upcoming_df = fetch_upcoming_meetings(lessons_df)
-            scheduled_weeks = set(updated_upcoming_df["lesson_week"].astype(int).tolist())
-            if int(selected_week) in scheduled_weeks:
-                scheduled_weeks.discard(int(selected_week))
-
-            next_available_week = next(
+            st.markdown(
                 (
-                    week
-                    for week in weeks
-                    if week not in updated_done_weeks and week not in scheduled_weeks
+                    "<div class='sg-lesson-section'>"
+                    "<div class='sg-lesson-section-title'>Summary</div>"
+                    f"<div class='sg-lesson-summary'>{escape(str(lesson['one_sentence_summary']))}</div>"
+                    "</div>"
                 ),
-                None,
+                unsafe_allow_html=True,
             )
-            if next_available_week is None:
-                next_available_week = next(
-                    (week for week in weeks if week not in updated_done_weeks),
-                    None,
+            st.markdown(
+                (
+                    "<div class='sg-lesson-section'>"
+                    "<div class='sg-lesson-section-title'>Big Idea</div>"
+                    f"<div class='sg-lesson-big-idea'>{escape(big_idea)}</div>"
+                    "</div>"
+                ),
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                (
+                    "<div class='sg-lesson-section'>"
+                    "<div class='sg-lesson-section-title'>Anchor Verse</div>"
+                    f"<div class='sg-anchor-ref'>{escape(verse_ref)}</div>"
+                    f"<div class='sg-tight-link'><a href='{escape(verse_url + '&version=NIV', quote=True)}' target='_blank'>Open verse in BibleGateway</a></div>"
+                    "</div>"
+                ),
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                (
+                    "<div class='sg-lesson-section'>"
+                    "<div class='sg-lesson-section-title'>Video</div>"
+                    f"<div class='sg-lesson-summary'>{escape(str(lesson['video_name']))}</div>"
+                    f"<div class='sg-tight-link'><a href='{escape(video_url, quote=True)}' target='_blank'>{escape(video_url)}</a></div>"
+                    "</div>"
+                ),
+                unsafe_allow_html=True,
+            )
+
+            discussion_blocks: List[str] = []
+            for level in QUESTION_LEVELS:
+                questions_html = "".join(
+                    f"<li>{escape(question)}</li>" for question in effective_questions[level]
+                )
+                discussion_blocks.append(
+                    f"<li><span class='sg-outline-level'>{escape(QUESTION_LABELS[level])}</span><ul>{questions_html}</ul></li>"
                 )
 
-            if next_available_week is not None:
-                st.session_state["lessons_selected_week"] = int(next_available_week)
+            outline_html = (
+                "<div class='sg-lesson-section'>"
+                "<div class='sg-lesson-section-title'>Discussion Outline</div>"
+                "<div class='sg-outline'><ul>"
+                f"<li>{escape(big_idea)}</li>"
+                f"<li>Video: <a href='{escape(video_url, quote=True)}' target='_blank'>{escape(str(lesson['video_name']))}</a></li>"
+                f"<li>Anchor Verse: {escape(verse_ref)}</li>"
+                "<li>Questions<ul>"
+                f"{''.join(discussion_blocks)}"
+                "</ul></li>"
+                "</ul></div>"
+                "</div>"
+            )
+            st.markdown(outline_html, unsafe_allow_html=True)
 
-                upcoming_df = fetch_upcoming_meetings(lessons_df)
-                same_lesson_upcoming = upcoming_df[upcoming_df["lesson_week"] == int(selected_week)]
-                if not same_lesson_upcoming.empty:
-                    row = same_lesson_upcoming.iloc[0]
-                    host_name = "" if pd.isna(row["host_name"]) else str(row["host_name"])
-                    facilitator_name = (
-                        "" if pd.isna(row["facilitator_name"]) else str(row["facilitator_name"])
+        with right_col:
+            with st.container(border=True):
+                render_section_header("Lesson Status")
+                st.markdown(render_status_badge(lesson_status), unsafe_allow_html=True)
+                if scheduled_date_label and lesson_status != "Done":
+                    st.caption(f"Scheduled date: {scheduled_date_label}")
+
+            with st.container(border=True):
+                render_section_header("Facilitator Notes")
+                with st.form(f"facilitator_notes_form_{selected_week}"):
+                    notes_text = st.text_area(
+                        "Facilitator notes",
+                        value=get_lesson_notes(int(selected_week)),
+                        height=180,
+                        label_visibility="collapsed",
+                        placeholder="Capture prayer requests, context, and follow-up ideas.",
                     )
-                    notes = "" if pd.isna(row["notes"]) else str(row["notes"])
-                    update_upcoming_meeting(
-                        int(row["id"]),
-                        int(next_available_week),
-                        host_name,
-                        facilitator_name,
-                        notes,
+                    save_notes = st.form_submit_button(
+                        "Save notes",
+                        type="primary",
+                        use_container_width=True,
                     )
-                    queue_message(
-                        f"Lesson {selected_week} marked completed. Advanced an upcoming meeting to lesson {next_available_week}."
+
+                if save_notes:
+                    save_lesson_notes(int(selected_week), notes_text)
+                    queue_message(f"Facilitator notes saved for lesson {selected_week}.")
+                    st.rerun()
+
+            with st.container(border=True):
+                render_section_header(
+                    "Mark Complete",
+                    "Use this when the group has finished this lesson.",
+                )
+                if st.button(
+                    "Mark lesson complete",
+                    type="primary",
+                    use_container_width=True,
+                    key=f"lesson_completed_{selected_week}",
+                ):
+                    add_meeting_log(
+                        date.today(),
+                        int(selected_week),
+                        "Completed",
+                        "Marked completed from Lessons page",
                     )
-                else:
-                    queue_message(f"Lesson {selected_week} marked completed.")
-            else:
-                st.session_state["lessons_selected_week"] = int(selected_week)
-                queue_message(f"Lesson {selected_week} marked completed. All lessons are now done.")
-            st.rerun()
+
+                    updated_done_weeks = get_done_weeks()
+                    updated_upcoming_df = fetch_upcoming_meetings(lessons_df)
+                    scheduled_weeks = set(updated_upcoming_df["lesson_week"].astype(int).tolist())
+                    if int(selected_week) in scheduled_weeks:
+                        scheduled_weeks.discard(int(selected_week))
+
+                    next_available_week = next(
+                        (
+                            week
+                            for week in weeks
+                            if week not in updated_done_weeks and week not in scheduled_weeks
+                        ),
+                        None,
+                    )
+                    if next_available_week is None:
+                        next_available_week = next(
+                            (week for week in weeks if week not in updated_done_weeks),
+                            None,
+                        )
+
+                    if next_available_week is not None:
+                        st.session_state["lessons_selected_week"] = int(next_available_week)
+
+                        refreshed_upcoming_df = fetch_upcoming_meetings(lessons_df)
+                        same_lesson_upcoming = refreshed_upcoming_df[
+                            refreshed_upcoming_df["lesson_week"] == int(selected_week)
+                        ]
+                        if not same_lesson_upcoming.empty:
+                            row = same_lesson_upcoming.iloc[0]
+                            host_name = "" if pd.isna(row["host_name"]) else str(row["host_name"])
+                            facilitator_name = (
+                                "" if pd.isna(row["facilitator_name"]) else str(row["facilitator_name"])
+                            )
+                            notes = "" if pd.isna(row["notes"]) else str(row["notes"])
+                            update_upcoming_meeting(
+                                int(row["id"]),
+                                int(next_available_week),
+                                host_name,
+                                facilitator_name,
+                                notes,
+                            )
+                            queue_message(
+                                f"Lesson {selected_week} marked complete. Advanced one upcoming meeting to lesson {next_available_week}."
+                            )
+                        else:
+                            queue_message(f"Lesson {selected_week} marked complete.")
+                    else:
+                        st.session_state["lessons_selected_week"] = int(selected_week)
+                        queue_message(
+                            f"Lesson {selected_week} marked complete. All lessons are now done."
+                        )
+                    st.rerun()
 
     if unit_overview:
         with st.container(border=True):
-            st.markdown("#### Lesson Overview")
-            st.markdown(
-                (
-                    "This 24-lesson journey is designed to move our group from God's big story to "
-                    "Jesus' way of life to deep trust in God's character. We start with 8 Big Themes "
-                    "(Image of God through Heaven & Earth) to give everyone-kids and adults-a shared "
-                    "\"map\" of the Bible: who we are, what God is doing, and why Jesus matters. From "
-                    "there, we step into the Sermon on the Mount unit, where Jesus takes that story "
-                    "and turns it into a daily discipleship blueprint-how Kingdom people speak, pray, "
-                    "handle anxiety and money, treat others, and build a life that lasts. Finally, we "
-                    "finish with Character of God (anchored in Exodus 34:6-7) so the whole year lands "
-                    "not just in better habits, but in greater confidence in who God is-compassionate, "
-                    "gracious, patient, loyal, and faithful-because lasting obedience grows best from "
-                    "worship and trust. Each unit builds on the previous one: identity and story -> "
-                    "practices and choices -> trust and formation, so the group leaves with a clear "
-                    "sense of the Bible's message and a practical call to live it together."
-                )
+            render_section_header(
+                "Curriculum Overview",
+                "Three units move the group from biblical foundations to practical discipleship and trust in God's character.",
             )
-            for idx, unit in enumerate(unit_overview):
+            for unit in unit_overview:
                 st.markdown(f"**{unit['title']}**")
                 st.caption(unit["summary"])
-                with st.expander(f"Show lessons in {unit['title']}", expanded=False):
+                with st.expander(f"View lessons in {unit['title']}", expanded=False):
                     lesson_lines = "\n".join([f"- {line}" for line in unit["lessons"]])
                     st.markdown(lesson_lines)
 
@@ -2271,6 +2632,15 @@ def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
     done_weeks = get_done_weeks()
     completed_count = len([week for week in done_weeks if 1 <= week <= TOTAL_LESSONS])
     remaining_count = max(TOTAL_LESSONS - completed_count, 0)
+    render_page_header(
+        "Admin & Operations",
+        "Manage upcoming dates, family assignments, and historical meeting records.",
+        "Admin",
+    )
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Completed", f"{completed_count}/{TOTAL_LESSONS}")
+    m2.metric("Remaining", str(remaining_count))
+    m3.metric("Upcoming dates", str(len(upcoming_df)))
 
     scheduled_dates_by_week: Dict[int, List[str]] = {}
     for row in upcoming_df.to_dict(orient="records"):
@@ -2307,410 +2677,465 @@ def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
             return f"{label} ({' | '.join(extras)})"
         return label
 
-    with st.container(border=True):
-        st.markdown("#### Add New Meeting Date")
-        st.caption("Create a new upcoming date. It will appear in Active Meeting Dates below.")
-        with st.form("meeting_log_add_meeting_date_form", clear_on_submit=True):
-            new_meeting_date = st.date_input(
-                "Meeting date",
-                value=date.today(),
-                format="MM/DD/YYYY",
+    schedule_tab, families_tab, history_tab = st.tabs(
+        ["Schedule Dates", "Families", "Meeting History"]
+    )
+
+    with schedule_tab:
+        with st.container(border=True):
+            render_section_header(
+                "Add Meeting Date",
+                "Create an upcoming meeting date. Host and facilitator default to TBD.",
             )
-            new_meeting_week = st.selectbox(
-                "Lesson",
-                options=weeks,
-                index=weeks.index(default_week),
-                format_func=lesson_dropdown_label,
+            with st.form("meeting_log_add_meeting_date_form", clear_on_submit=True):
+                new_meeting_date = st.date_input(
+                    "Meeting date",
+                    value=date.today(),
+                    format="MM/DD/YYYY",
+                )
+                new_meeting_week = st.selectbox(
+                    "Lesson",
+                    options=weeks,
+                    index=weeks.index(default_week),
+                    format_func=lesson_dropdown_label,
+                )
+                if next_available_week is not None:
+                    st.caption(f"Next available lesson: {lesson_dropdown_label(next_available_week)}")
+                else:
+                    st.caption("All unfinished lessons are already scheduled.")
+                add_meeting_date = st.form_submit_button(
+                    "Add meeting date",
+                    type="primary",
+                    use_container_width=True,
+                )
+
+        if add_meeting_date:
+            add_upcoming_meeting(
+                new_meeting_date,
+                int(new_meeting_week),
+                TBD_OPTION,
+                TBD_OPTION,
+                "",
             )
-            if next_available_week is not None:
-                st.caption(f"Next available lesson: {lesson_dropdown_label(next_available_week)}")
+            queue_message("Meeting date added. It now appears on Home.")
+            st.rerun()
+
+        with st.container(border=True):
+            render_section_header(
+                "Active Meeting Dates",
+                "Select a date to edit assigned lesson, host, facilitator, or notes.",
+            )
+
+            if upcoming_df.empty:
+                render_empty_state(
+                    "No upcoming dates yet",
+                    "Add your first meeting date above to begin planning.",
+                )
             else:
-                st.caption("Next available lesson: all uncompleted lessons are already scheduled.")
-            st.caption("Host and Facilitator default to TBD until assigned.")
-            add_button_label = "Add Meeting to Active Dates"
-            add_meeting_date = st.form_submit_button(add_button_label, use_container_width=True)
+                upcoming_ids = upcoming_df["id"].astype(int).tolist()
+                if (
+                    "meeting_log_selected_upcoming_id" not in st.session_state
+                    or st.session_state["meeting_log_selected_upcoming_id"] not in upcoming_ids
+                ):
+                    st.session_state["meeting_log_selected_upcoming_id"] = upcoming_ids[0]
 
-    if add_meeting_date:
-        add_upcoming_meeting(
-            new_meeting_date,
-            int(new_meeting_week),
-            TBD_OPTION,
-            TBD_OPTION,
-            "",
-        )
-        queue_message("Meeting date added. It now appears on Home.")
-        st.rerun()
+                selected_upcoming_id = int(st.session_state["meeting_log_selected_upcoming_id"])
+                rolodex_rows = upcoming_df.to_dict(orient="records")
+                rolodex_cols = 4
+                for row_idx, row in enumerate(rolodex_rows):
+                    if row_idx % rolodex_cols == 0:
+                        cols = st.columns(rolodex_cols)
+                    row_id = int(row["id"])
+                    is_selected = row_id == selected_upcoming_id
+                    with cols[row_idx % rolodex_cols]:
+                        label_prefix = "Next" if row_idx == 0 else "Upcoming"
+                        label = f"{label_prefix}: {format_meeting_date(row['meeting_date'])}"
+                        if st.button(
+                            label,
+                            key=f"meeting_log_select_upcoming_{row_id}",
+                            type="primary" if is_selected else "secondary",
+                            use_container_width=True,
+                        ):
+                            st.session_state["meeting_log_selected_upcoming_id"] = row_id
+                            st.rerun()
 
-    with st.container(border=True):
-        st.markdown("#### Active Meeting Dates")
-        st.caption("These dates are already created and can be edited below.")
+                selected_row = upcoming_df[upcoming_df["id"] == selected_upcoming_id].iloc[0]
+                selected_week = (
+                    int(selected_row["lesson_week"])
+                    if int(selected_row["lesson_week"]) in weeks
+                    else default_week
+                )
+                edit_person_options = list(person_options)
+                saved_host_name = str(selected_row["host_name"]).strip()
+                saved_facilitator_name = str(selected_row["facilitator_name"]).strip()
+                if saved_host_name and saved_host_name not in edit_person_options:
+                    edit_person_options.append(saved_host_name)
+                if saved_facilitator_name and saved_facilitator_name not in edit_person_options:
+                    edit_person_options.append(saved_facilitator_name)
+                host_default_selection = (
+                    saved_host_name if saved_host_name in edit_person_options else edit_person_options[0]
+                )
+                facilitator_default_selection = (
+                    saved_facilitator_name
+                    if saved_facilitator_name in edit_person_options
+                    else edit_person_options[0]
+                )
 
-        if upcoming_df.empty:
-            st.info("No upcoming meeting dates set yet.")
-        else:
-            upcoming_ids = upcoming_df["id"].astype(int).tolist()
-            if (
-                "meeting_log_selected_upcoming_id" not in st.session_state
-                or st.session_state["meeting_log_selected_upcoming_id"] not in upcoming_ids
-            ):
-                st.session_state["meeting_log_selected_upcoming_id"] = upcoming_ids[0]
+                with st.container(border=True):
+                    render_section_header(
+                        f"Edit Meeting: {format_meeting_date(selected_row['meeting_date'])}",
+                    )
+                    st.text_input(
+                        "Date",
+                        value=format_meeting_date(selected_row["meeting_date"]),
+                        disabled=True,
+                    )
+                    edit_week = st.selectbox(
+                        "Lesson",
+                        options=weeks,
+                        index=weeks.index(selected_week),
+                        format_func=lesson_dropdown_label,
+                        key=f"meeting_log_edit_upcoming_lesson_{selected_upcoming_id}",
+                    )
+                    c1, c2 = st.columns(2)
+                    edit_host_select = c1.selectbox(
+                        "Host",
+                        options=edit_person_options,
+                        index=edit_person_options.index(host_default_selection),
+                        key=f"meeting_log_edit_upcoming_host_{selected_upcoming_id}",
+                    )
+                    edit_facilitator_select = c2.selectbox(
+                        "Facilitator",
+                        options=edit_person_options,
+                        index=edit_person_options.index(facilitator_default_selection),
+                        key=f"meeting_log_edit_upcoming_facilitator_{selected_upcoming_id}",
+                    )
+                    edit_notes = st.text_area(
+                        "Notes",
+                        value=str(selected_row["notes"]),
+                        height=92,
+                        key=f"meeting_log_edit_upcoming_notes_{selected_upcoming_id}",
+                        placeholder="Optional reminders, agenda notes, or logistics.",
+                    )
 
-            selected_upcoming_id = int(st.session_state["meeting_log_selected_upcoming_id"])
+                    original_edit_notes = (
+                        "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
+                    )
+                    edit_has_unsaved_changes = (
+                        int(edit_week) != int(selected_week)
+                        or str(edit_host_select) != str(host_default_selection)
+                        or str(edit_facilitator_select) != str(facilitator_default_selection)
+                        or str(edit_notes) != str(original_edit_notes)
+                    )
 
-            st.caption("Select a date to edit lesson, host, facilitator, or notes.")
-            rolodex_rows = upcoming_df.to_dict(orient="records")
-            rolodex_cols = 4
-            for row_idx, row in enumerate(rolodex_rows):
-                if row_idx % rolodex_cols == 0:
-                    cols = st.columns(rolodex_cols)
-                row_id = int(row["id"])
-                is_selected = row_id == selected_upcoming_id
-                with cols[row_idx % rolodex_cols]:
-                    label_prefix = "Next" if row_idx == 0 else "Upcoming"
-                    label = f"{label_prefix}: {format_meeting_date(row['meeting_date'])}"
+                    if edit_has_unsaved_changes:
+                        st.markdown(
+                            (
+                                "<div class='sg-save-required'>"
+                                "Unsaved changes detected. Click <b>Save meeting date changes</b>."
+                                "</div>"
+                            ),
+                            unsafe_allow_html=True,
+                        )
+
                     if st.button(
-                        label,
-                        key=f"meeting_log_select_upcoming_{row_id}",
-                        type="primary" if is_selected else "secondary",
+                        "Save meeting date changes",
+                        key=f"meeting_log_save_upcoming_{selected_upcoming_id}",
+                        type="primary",
                         use_container_width=True,
                     ):
-                        st.session_state["meeting_log_selected_upcoming_id"] = row_id
+                        if not edit_has_unsaved_changes:
+                            notify("No meeting date changes to save.", "info")
+                        else:
+                            update_upcoming_meeting(
+                                selected_upcoming_id,
+                                int(edit_week),
+                                str(edit_host_select),
+                                str(edit_facilitator_select),
+                                edit_notes,
+                            )
+                            queue_message("Selected meeting date updated.")
+                            st.rerun()
+
+                    delete_pending_key = f"meeting_log_delete_pending_upcoming_{selected_upcoming_id}"
+                    if st.button(
+                        "Delete this meeting date",
+                        key=f"meeting_log_delete_upcoming_{selected_upcoming_id}",
+                        use_container_width=True,
+                    ):
+                        st.session_state[delete_pending_key] = True
                         st.rerun()
 
-            selected_row = upcoming_df[upcoming_df["id"] == selected_upcoming_id].iloc[0]
-            selected_week = (
-                int(selected_row["lesson_week"])
-                if int(selected_row["lesson_week"]) in weeks
-                else default_week
-            )
-            edit_person_options = list(person_options)
-            saved_host_name = str(selected_row["host_name"]).strip()
-            saved_facilitator_name = str(selected_row["facilitator_name"]).strip()
-            if saved_host_name and saved_host_name not in edit_person_options:
-                edit_person_options.append(saved_host_name)
-            if saved_facilitator_name and saved_facilitator_name not in edit_person_options:
-                edit_person_options.append(saved_facilitator_name)
-            host_default_selection = (
-                saved_host_name if saved_host_name in edit_person_options else edit_person_options[0]
-            )
-            facilitator_default_selection = (
-                saved_facilitator_name
-                if saved_facilitator_name in edit_person_options
-                else edit_person_options[0]
-            )
+                    if st.session_state.get(delete_pending_key, False):
+                        st.markdown(
+                            "<div class='sg-action-alert'>Delete this meeting date?</div>",
+                            unsafe_allow_html=True,
+                        )
+                        d1, d2 = st.columns(2)
+                        if d1.button(
+                            "Confirm delete",
+                            key=f"meeting_log_confirm_delete_upcoming_{selected_upcoming_id}",
+                            type="primary",
+                            use_container_width=True,
+                        ):
+                            delete_upcoming_meeting(selected_upcoming_id)
+                            st.session_state.pop(delete_pending_key, None)
+                            queue_message("Meeting date deleted.")
+                            st.rerun()
+                        if d2.button(
+                            "Cancel",
+                            key=f"meeting_log_cancel_delete_upcoming_{selected_upcoming_id}",
+                            use_container_width=True,
+                        ):
+                            st.session_state.pop(delete_pending_key, None)
+                            notify("Delete canceled.", "info")
+                            st.rerun()
 
-            st.markdown("**Edit Selected Meeting Date**")
-            st.text_input(
-                "Date",
-                value=format_meeting_date(selected_row["meeting_date"]),
-                disabled=True,
+    with families_tab:
+        with st.container(border=True):
+            render_section_header(
+                "Small Group Families",
+                "This list powers Host and Facilitator dropdowns.",
             )
-            edit_week = st.selectbox(
-                "Lesson",
-                options=weeks,
-                index=weeks.index(selected_week),
-                format_func=lesson_dropdown_label,
-                key=f"meeting_log_edit_upcoming_lesson_{selected_upcoming_id}",
-            )
-            c1, c2 = st.columns(2)
-            edit_host_select = c1.selectbox(
-                "Host",
-                options=edit_person_options,
-                index=edit_person_options.index(host_default_selection),
-                key=f"meeting_log_edit_upcoming_host_{selected_upcoming_id}",
-            )
-            edit_facilitator_select = c2.selectbox(
-                "Facilitator",
-                options=edit_person_options,
-                index=edit_person_options.index(facilitator_default_selection),
-                key=f"meeting_log_edit_upcoming_facilitator_{selected_upcoming_id}",
-            )
-            edit_notes = st.text_area(
-                "Notes",
-                value=str(selected_row["notes"]),
-                height=80,
-                key=f"meeting_log_edit_upcoming_notes_{selected_upcoming_id}",
-            )
+            families_df = pd.DataFrame({"Family": fetch_small_group_families()})
+            if families_df.empty:
+                families_df = pd.DataFrame({"Family": list(DEFAULT_FAMILY_OPTIONS)})
 
-            original_edit_notes = "" if pd.isna(selected_row["notes"]) else str(selected_row["notes"])
-            edit_has_unsaved_changes = (
-                int(edit_week) != int(selected_week)
-                or str(edit_host_select) != str(host_default_selection)
-                or str(edit_facilitator_select) != str(facilitator_default_selection)
-                or str(edit_notes) != str(original_edit_notes)
-            )
+            if "admin_edit_families" not in st.session_state:
+                st.session_state["admin_edit_families"] = False
 
-            if edit_has_unsaved_changes:
-                st.markdown(
-                    (
-                        "<div class='sg-save-required'>"
-                        "Changes are not stored automatically. Click <b>Save selected meeting date</b> to keep updates."
-                        "</div>"
-                    ),
-                    unsafe_allow_html=True,
-                )
-
-            if st.button("Save selected meeting date", use_container_width=True):
-                if not edit_has_unsaved_changes:
-                    notify("No meeting date changes to save.", "info")
-                else:
-                    update_upcoming_meeting(
-                        selected_upcoming_id,
-                        int(edit_week),
-                        str(edit_host_select),
-                        str(edit_facilitator_select),
-                        edit_notes,
+            if not st.session_state["admin_edit_families"]:
+                st.dataframe(families_df, hide_index=True, use_container_width=True)
+                if st.button("Edit family list", use_container_width=True):
+                    st.session_state["admin_edit_families"] = True
+                    st.rerun()
+            else:
+                st.info("Editing mode is enabled. Add/remove rows, then save or cancel.")
+                with st.form("admin_edit_families_form"):
+                    family_editor_df = st.data_editor(
+                        families_df,
+                        hide_index=True,
+                        use_container_width=True,
+                        num_rows="dynamic",
+                        column_order=["Family"],
+                        column_config={
+                            "Family": st.column_config.TextColumn("Family", width="large"),
+                        },
+                        key="admin_small_group_families_editor",
                     )
-                    queue_message("Selected meeting date updated.")
+                    c1, c2 = st.columns(2)
+                    save_family_changes = c1.form_submit_button(
+                        "Save family list",
+                        type="primary",
+                        use_container_width=True,
+                    )
+                    cancel_family_changes = c2.form_submit_button(
+                        "Cancel",
+                        use_container_width=True,
+                    )
+
+                if save_family_changes:
+                    saved_count = save_small_group_families(
+                        [str(value) for value in family_editor_df["Family"].tolist()]
+                    )
+                    if saved_count == 0:
+                        notify("Add at least one family name before saving.", "warning")
+                    else:
+                        st.session_state["admin_edit_families"] = False
+                        queue_message(f"Saved {saved_count} small group families.")
+                        st.rerun()
+
+                if cancel_family_changes:
+                    st.session_state["admin_edit_families"] = False
+                    notify("Family edit canceled.", "info")
                     st.rerun()
 
-            delete_pending_key = f"meeting_log_delete_pending_upcoming_{selected_upcoming_id}"
-            if st.button(
-                "Delete selected meeting date",
-                key=f"meeting_log_delete_upcoming_{selected_upcoming_id}",
-                use_container_width=True,
-            ):
-                st.session_state[delete_pending_key] = True
-                st.rerun()
-
-            if st.session_state.get(delete_pending_key, False):
-                st.markdown(
-                    "<div class='sg-action-alert'>Delete this meeting date?</div>",
-                    unsafe_allow_html=True,
+    with history_tab:
+        with st.container(border=True):
+            render_section_header(
+                "Logged Meetings",
+                "Review historical records, adjust status/notes, or remove an incorrect entry.",
+            )
+            log_df = fetch_meeting_log(lessons_df)
+            if log_df.empty:
+                render_empty_state(
+                    "No meetings logged yet",
+                    "Completed meetings will appear here once they are logged.",
                 )
-                d1, d2 = st.columns(2)
-                if d1.button(
-                    "Confirm delete",
-                    key=f"meeting_log_confirm_delete_upcoming_{selected_upcoming_id}",
+            else:
+                edited_df = st.data_editor(
+                    log_df,
+                    hide_index=True,
+                    use_container_width=True,
+                    disabled=["id", "meeting_date", "lesson_week", "lesson_theme"],
+                    column_order=[
+                        "id",
+                        "meeting_date",
+                        "lesson_week",
+                        "lesson_theme",
+                        "status",
+                        "host_name",
+                        "facilitator_name",
+                        "notes",
+                    ],
+                    column_config={
+                        "id": st.column_config.NumberColumn("ID", width="small"),
+                        "meeting_date": st.column_config.TextColumn("Meeting date", width="small"),
+                        "lesson_week": st.column_config.NumberColumn("Lesson week", width="small"),
+                        "lesson_theme": st.column_config.TextColumn("Lesson theme", width="medium"),
+                        "status": st.column_config.SelectboxColumn(
+                            "Status",
+                            options=MEETING_STATUS_OPTIONS,
+                            required=True,
+                            width="small",
+                        ),
+                        "host_name": st.column_config.TextColumn("Host", width="small"),
+                        "facilitator_name": st.column_config.TextColumn("Facilitator", width="small"),
+                        "notes": st.column_config.TextColumn("Notes", width="large"),
+                    },
+                    key="meeting_log_editor",
+                )
+
+                if st.button(
+                    "Save meeting log edits",
                     type="primary",
                     use_container_width=True,
                 ):
-                    delete_upcoming_meeting(selected_upcoming_id)
-                    st.session_state.pop(delete_pending_key, None)
-                    queue_message("Meeting date deleted.")
-                    st.rerun()
-                if d2.button(
-                    "Cancel",
-                    key=f"meeting_log_cancel_delete_upcoming_{selected_upcoming_id}",
-                    use_container_width=True,
-                ):
-                    st.session_state.pop(delete_pending_key, None)
-                    notify("Delete canceled.", "info")
-                    st.rerun()
+                    original = log_df.set_index("id")
+                    changes = 0
+                    for row in edited_df.to_dict(orient="records"):
+                        record_id = int(row["id"])
+                        new_status = str(row.get("status", "Skipped"))
+                        if new_status not in MEETING_STATUS_OPTIONS:
+                            new_status = "Skipped"
 
-    st.markdown("---")
+                        new_notes = row.get("notes", "")
+                        new_notes = "" if pd.isna(new_notes) else str(new_notes)
+                        new_host = row.get("host_name", "")
+                        new_host = "" if pd.isna(new_host) else str(new_host)
+                        new_facilitator = row.get("facilitator_name", "")
+                        new_facilitator = "" if pd.isna(new_facilitator) else str(new_facilitator)
 
-    st.markdown("### Small Group Families")
-    st.caption("Used for Host and Facilitator dropdowns. The list is locked until you click Edit.")
-    families_df = pd.DataFrame({"Family": fetch_small_group_families()})
-    if families_df.empty:
-        families_df = pd.DataFrame({"Family": list(DEFAULT_FAMILY_OPTIONS)})
+                        old_row = original.loc[record_id]
+                        old_notes = old_row["notes"] if not pd.isna(old_row["notes"]) else ""
+                        old_host = old_row["host_name"] if not pd.isna(old_row["host_name"]) else ""
+                        old_facilitator = (
+                            old_row["facilitator_name"]
+                            if not pd.isna(old_row["facilitator_name"])
+                            else ""
+                        )
 
-    if "admin_edit_families" not in st.session_state:
-        st.session_state["admin_edit_families"] = False
+                        if (
+                            new_status != old_row["status"]
+                            or str(new_notes) != str(old_notes)
+                            or str(new_host) != str(old_host)
+                            or str(new_facilitator) != str(old_facilitator)
+                        ):
+                            update_meeting_record(
+                                record_id,
+                                new_status,
+                                new_notes,
+                                new_host,
+                                new_facilitator,
+                            )
+                            changes += 1
 
-    if not st.session_state["admin_edit_families"]:
-        st.dataframe(families_df, hide_index=True, use_container_width=True)
-        if st.button("Edit Small Group Families", use_container_width=True):
-            st.session_state["admin_edit_families"] = True
-            st.rerun()
-    else:
-        st.info("Editing mode is on. Add/remove rows, then save or cancel.")
-        with st.form("admin_edit_families_form"):
-            family_editor_df = st.data_editor(
-                families_df,
-                hide_index=True,
-                use_container_width=True,
-                num_rows="dynamic",
-                column_order=["Family"],
-                column_config={
-                    "Family": st.column_config.TextColumn("Family", width="large"),
-                },
-                key="admin_small_group_families_editor",
-            )
-            c1, c2 = st.columns(2)
-            save_family_changes = c1.form_submit_button("Save Small Group Families")
-            cancel_family_changes = c2.form_submit_button("Cancel")
+                    if changes:
+                        queue_message(f"Saved {changes} meeting log update(s).")
+                        st.rerun()
+                    else:
+                        notify("No changes to save.", "info")
 
-        if save_family_changes:
-            saved_count = save_small_group_families(
-                [str(value) for value in family_editor_df["Family"].tolist()]
-            )
-            if saved_count == 0:
-                notify("Add at least one family name before saving.", "warning")
-            else:
-                st.session_state["admin_edit_families"] = False
-                queue_message(f"Saved {saved_count} Small Group Families.")
-                st.rerun()
-
-        if cancel_family_changes:
-            st.session_state["admin_edit_families"] = False
-            notify("Family edit canceled.", "info")
-            st.rerun()
-
-    st.markdown("---")
-    st.markdown("### Logged meetings")
-
-    log_df = fetch_meeting_log(lessons_df)
-    if log_df.empty:
-        st.info("No meetings logged yet.")
-    else:
-        edited_df = st.data_editor(
-            log_df,
-            hide_index=True,
-            use_container_width=True,
-            disabled=["id", "meeting_date", "lesson_week", "lesson_theme"],
-            column_order=[
-                "id",
-                "meeting_date",
-                "lesson_week",
-                "lesson_theme",
-                "status",
-                "host_name",
-                "facilitator_name",
-                "notes",
-            ],
-            column_config={
-                "id": st.column_config.NumberColumn("ID", width="small"),
-                "meeting_date": st.column_config.TextColumn("Meeting date", width="small"),
-                "lesson_week": st.column_config.NumberColumn("Lesson week", width="small"),
-                "lesson_theme": st.column_config.TextColumn("Lesson theme", width="medium"),
-                "status": st.column_config.SelectboxColumn(
-                    "Status",
-                    options=MEETING_STATUS_OPTIONS,
-                    required=True,
-                    width="small",
-                ),
-                "host_name": st.column_config.TextColumn("Host", width="small"),
-                "facilitator_name": st.column_config.TextColumn("Facilitator", width="small"),
-                "notes": st.column_config.TextColumn("Notes", width="large"),
-            },
-            key="meeting_log_editor",
-        )
-
-        if st.button("Save edited status/notes"):
-            original = log_df.set_index("id")
-            changes = 0
-
-            for row in edited_df.to_dict(orient="records"):
-                record_id = int(row["id"])
-                new_status = str(row.get("status", "Skipped"))
-                if new_status not in MEETING_STATUS_OPTIONS:
-                    new_status = "Skipped"
-
-                new_notes = row.get("notes", "")
-                new_notes = "" if pd.isna(new_notes) else str(new_notes)
-                new_host = row.get("host_name", "")
-                new_host = "" if pd.isna(new_host) else str(new_host)
-                new_facilitator = row.get("facilitator_name", "")
-                new_facilitator = "" if pd.isna(new_facilitator) else str(new_facilitator)
-
-                old_row = original.loc[record_id]
-                old_notes = old_row["notes"] if not pd.isna(old_row["notes"]) else ""
-                old_host = old_row["host_name"] if not pd.isna(old_row["host_name"]) else ""
-                old_facilitator = (
-                    old_row["facilitator_name"]
-                    if not pd.isna(old_row["facilitator_name"])
-                    else ""
-                )
-
-                if (
-                    new_status != old_row["status"]
-                    or str(new_notes) != str(old_notes)
-                    or str(new_host) != str(old_host)
-                    or str(new_facilitator) != str(old_facilitator)
-                ):
-                    update_meeting_record(
-                        record_id,
-                        new_status,
-                        new_notes,
-                        new_host,
-                        new_facilitator,
+                render_section_header("Delete Record")
+                delete_options = {}
+                for row in log_df.to_dict(orient="records"):
+                    label = (
+                        f"#{row['id']} | {row['meeting_date']} | Week {row['lesson_week']} - "
+                        f"{row['lesson_theme']} | {row['status']}"
                     )
-                    changes += 1
+                    delete_options[label] = int(row["id"])
 
-            if changes:
-                queue_message(f"Saved {changes} meeting log update(s).")
-                st.rerun()
-            else:
-                notify("No changes to save.", "info")
-
-        st.markdown("### Delete a meeting record")
-        delete_options = {}
-        for row in log_df.to_dict(orient="records"):
-            label = (
-                f"#{row['id']} | {row['meeting_date']} | Week {row['lesson_week']} - "
-                f"{row['lesson_theme']} | {row['status']}"
-            )
-            delete_options[label] = int(row["id"])
-
-        selected_label = st.selectbox("Select record", options=list(delete_options.keys()))
-        confirm_delete = st.checkbox("I confirm this delete cannot be undone.")
-
-        if st.button("Delete selected record"):
-            if not confirm_delete:
-                notify("Please confirm deletion before continuing.", "warning")
-            else:
-                delete_meeting_record(delete_options[selected_label])
-                queue_message("Meeting record deleted.")
-                st.rerun()
-
-    st.markdown("---")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Completed", f"{completed_count}/{TOTAL_LESSONS}")
-    c2.metric("Remaining", str(remaining_count))
-    c3.metric("Upcoming dates", str(len(upcoming_df)))
+                selected_label = st.selectbox("Select record", options=list(delete_options.keys()))
+                confirm_delete = st.checkbox("I confirm this delete cannot be undone.")
+                if st.button("Delete selected record", use_container_width=True):
+                    if not confirm_delete:
+                        notify("Please confirm deletion before continuing.", "warning")
+                    else:
+                        delete_meeting_record(delete_options[selected_label])
+                        queue_message("Meeting record deleted.")
+                        st.rerun()
 
 
 def render_settings_page(source_msg: str, lessons_count: int) -> None:
-    st.header("Settings")
-
-    st.markdown("### Lesson data")
-    st.caption(source_msg)
-    st.caption(f"Lessons loaded: {lessons_count}")
-
-    st.markdown("### Export backup")
-    backup_payload = export_backup_data()
-    backup_json = json.dumps(backup_payload, indent=2)
-
-    st.download_button(
-        "Export backup JSON",
-        data=backup_json,
-        file_name=f"smallgroup_backup_{date.today().isoformat()}.json",
-        mime="application/json",
+    render_page_header(
+        "Settings",
+        "Manage local data source visibility, backups, and reset controls.",
+        "System",
     )
 
-    st.markdown("### Import backup")
-    uploaded_file = st.file_uploader("Upload backup JSON", type=["json"])
-    import_confirm = st.checkbox("Replace existing local data with imported backup.")
+    with st.container(border=True):
+        render_section_header("Lesson Data")
+        st.caption(source_msg)
+        st.caption(f"Lessons loaded: {lessons_count}")
 
-    if st.button("Import backup", disabled=uploaded_file is None):
-        if uploaded_file is None:
-            notify("Upload a backup JSON file first.", "warning")
-        elif not import_confirm:
-            notify("Confirm replacement before importing.", "warning")
-        else:
-            try:
-                payload = json.load(uploaded_file)
-                import_backup_data(payload)
-            except Exception as exc:
-                notify(f"Import failed: {exc}", "error")
+    with st.container(border=True):
+        render_section_header(
+            "Export Backup",
+            "Download a full JSON backup of local application data.",
+        )
+        backup_payload = export_backup_data()
+        backup_json = json.dumps(backup_payload, indent=2)
+        st.download_button(
+            "Export backup JSON",
+            data=backup_json,
+            file_name=f"smallgroup_backup_{date.today().isoformat()}.json",
+            mime="application/json",
+            use_container_width=True,
+        )
+
+    with st.container(border=True):
+        render_section_header(
+            "Import Backup",
+            "Restore data from a previously exported JSON backup.",
+        )
+        uploaded_file = st.file_uploader("Upload backup JSON", type=["json"])
+        import_confirm = st.checkbox("Replace existing local data with imported backup.")
+
+        if st.button(
+            "Import backup",
+            disabled=uploaded_file is None,
+            type="primary",
+            use_container_width=True,
+        ):
+            if uploaded_file is None:
+                notify("Upload a backup JSON file first.", "warning")
+            elif not import_confirm:
+                notify("Confirm replacement before importing.", "warning")
             else:
-                queue_message("Backup imported successfully.")
+                try:
+                    payload = json.load(uploaded_file)
+                    import_backup_data(payload)
+                except Exception as exc:
+                    notify(f"Import failed: {exc}", "error")
+                else:
+                    queue_message("Backup imported successfully.")
+                    st.rerun()
+
+    with st.container(border=True):
+        render_section_header(
+            "Reset Database",
+            "Clear all local data and return to default setup.",
+        )
+        reset_confirm = st.checkbox(
+            "I understand this will erase all meeting logs, upcoming dates, meal signups, families, notes, NIV verse text, and custom questions."
+        )
+        if st.button("Reset database", use_container_width=True):
+            if not reset_confirm:
+                notify("Confirm reset before continuing.", "warning")
+            else:
+                reset_database_data()
+                queue_message("Database reset complete.")
                 st.rerun()
-
-    st.markdown("### Reset database")
-    reset_confirm = st.checkbox(
-        "I understand this will erase all meeting logs, upcoming dates, meal signups, Small Group Families, notes, NIV verse text, and custom questions."
-    )
-
-    if st.button("Reset database"):
-        if not reset_confirm:
-            notify("Confirm reset before continuing.", "warning")
-        else:
-            reset_database_data()
-            queue_message("Database reset complete.")
-            st.rerun()
 
 
 def main() -> None:
@@ -2720,12 +3145,11 @@ def main() -> None:
         layout="wide",
     )
     inject_global_styles()
-    inject_title_font_styles()
 
     init_db()
 
     try:
-        lessons_df, _, warning_msg = load_lessons()
+        lessons_df, source_msg, warning_msg = load_lessons()
     except Exception as exc:
         st.error(f"Could not load lesson data: {exc}")
         st.stop()
@@ -2735,7 +3159,7 @@ def main() -> None:
         st.error("No valid lessons were found in the lesson data file.")
         st.stop()
 
-    pages = ["Home", "Lessons", "Admin"]
+    pages = ["Home", "Lessons", "Admin", "Settings"]
     if "active_page" not in st.session_state or st.session_state["active_page"] not in pages:
         st.session_state["active_page"] = "Home"
     lesson_pick_param = get_query_param_int("lesson_pick")
@@ -2743,7 +3167,16 @@ def main() -> None:
         st.session_state["active_page"] = "Lessons"
 
     with st.sidebar:
-        st.markdown("### Navigation")
+        st.markdown(
+            (
+                "<div class='sg-sidebar-brand'>"
+                "<p class='sg-sidebar-title'>MCOC Devotional Manager</p>"
+                "<p class='sg-sidebar-subtitle'>A focused workspace for scheduling, planning, and tracking your small group rhythm.</p>"
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
+        st.markdown("<div class='sg-sidebar-section'>Navigation</div>", unsafe_allow_html=True)
         for nav_page in pages:
             if st.button(
                 nav_page,
@@ -2753,6 +3186,10 @@ def main() -> None:
             ):
                 st.session_state["active_page"] = nav_page
                 st.rerun()
+        completed_sidebar = len([week for week in get_done_weeks() if 1 <= week <= TOTAL_LESSONS])
+        st.markdown("<div class='sg-sidebar-section'>Progress</div>", unsafe_allow_html=True)
+        st.caption(f"Completed: {completed_sidebar}/{TOTAL_LESSONS}")
+        st.caption(f"Upcoming dates: {len(fetch_upcoming_meetings(lessons_df))}")
 
     page = str(st.session_state.get("active_page", "Home"))
 
@@ -2771,8 +3208,10 @@ def main() -> None:
         render_dashboard(lessons_df)
     elif page == "Lessons":
         render_lessons_page(lessons_df)
-    else:
+    elif page == "Admin":
         render_meeting_log_page(lessons_df)
+    else:
+        render_settings_page(source_msg, lessons_count)
 
 
 if __name__ == "__main__":
