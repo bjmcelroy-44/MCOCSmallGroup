@@ -3208,31 +3208,6 @@ def main() -> None:
     if lesson_pick_param is not None:
         st.session_state["active_page"] = "Lessons"
 
-    with st.sidebar:
-        st.markdown(
-            (
-                "<div class='sg-sidebar-brand'>"
-                "<p class='sg-sidebar-title'>MCOC Devotional Manager</p>"
-                "<p class='sg-sidebar-subtitle'>A focused workspace for scheduling, planning, and tracking your small group rhythm.</p>"
-                "</div>"
-            ),
-            unsafe_allow_html=True,
-        )
-        st.markdown("<div class='sg-sidebar-section'>Navigation</div>", unsafe_allow_html=True)
-        for nav_page in pages:
-            if st.button(
-                nav_page,
-                key=f"nav_button_{nav_page}",
-                type="primary" if st.session_state["active_page"] == nav_page else "secondary",
-                use_container_width=True,
-            ):
-                st.session_state["active_page"] = nav_page
-                st.rerun()
-        completed_sidebar = len([week for week in get_done_weeks() if 1 <= week <= TOTAL_LESSONS])
-        st.markdown("<div class='sg-sidebar-section'>Progress</div>", unsafe_allow_html=True)
-        st.caption(f"Completed: {completed_sidebar}/{TOTAL_LESSONS}")
-        st.caption(f"Upcoming dates: {len(fetch_upcoming_meetings(lessons_df))}")
-
     page = str(st.session_state.get("active_page", "Home"))
 
     show_queued_message()
