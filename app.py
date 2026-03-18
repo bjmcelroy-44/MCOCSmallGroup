@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from calendar import month_name, monthcalendar
+from calendar import Calendar, month_name
 from datetime import date, datetime
 from html import escape
 from pathlib import Path
@@ -300,30 +300,31 @@ def inject_global_styles() -> None:
         """
         <style>
         :root {
-            --sg-bg: #f3f4f6;
-            --sg-surface: #ffffff;
-            --sg-surface-muted: #f7f8fa;
-            --sg-border: #dddee3;
-            --sg-border-strong: #c8cbd3;
-            --sg-text: #111111;
-            --sg-muted: #424242;
-            --sg-muted-soft: #666666;
-            --sg-primary: #d5d8df;
-            --sg-primary-strong: #c4c9d2;
-            --sg-primary-soft: #eceff4;
-            --sg-success-soft: #eceff2;
-            --sg-success-text: #39424d;
-            --sg-danger-soft: #eceff2;
-            --sg-danger-text: #39424d;
-            --sg-warning-soft: #eceff2;
-            --sg-warning-text: #39424d;
-            --sg-destructive: #8a8f99;
-            --sg-destructive-soft: #eceff2;
-            --sg-radius-sm: 8px;
-            --sg-radius-md: 12px;
-            --sg-radius-lg: 16px;
-            --sg-shadow-sm: 0 1px 2px rgba(48, 38, 34, 0.06);
-            --sg-shadow-md: 0 8px 20px rgba(48, 38, 34, 0.08);
+            --sg-bg: #f6f4ef;
+            --sg-surface: #fffdfa;
+            --sg-surface-muted: #faf7f2;
+            --sg-border: #e4ded2;
+            --sg-border-strong: #cfd7d0;
+            --sg-text: #20231f;
+            --sg-muted: #586057;
+            --sg-muted-soft: #7a8179;
+            --sg-primary: #dbe4de;
+            --sg-primary-strong: #cbd7d0;
+            --sg-primary-soft: #edf2ee;
+            --sg-primary-ink: #425147;
+            --sg-success-soft: #ebf2ed;
+            --sg-success-text: #4f6557;
+            --sg-danger-soft: #f4eeea;
+            --sg-danger-text: #75615b;
+            --sg-warning-soft: #f4f0e5;
+            --sg-warning-text: #76684e;
+            --sg-destructive: #8d7c76;
+            --sg-destructive-soft: #f4eeea;
+            --sg-radius-sm: 10px;
+            --sg-radius-md: 14px;
+            --sg-radius-lg: 18px;
+            --sg-shadow-sm: 0 1px 2px rgba(51, 40, 28, 0.05);
+            --sg-shadow-md: 0 10px 22px rgba(51, 40, 28, 0.07);
         }
         .stApp {
             background: var(--sg-bg);
@@ -347,26 +348,26 @@ def inject_global_styles() -> None:
         }
         .main .block-container {
             max-width: 1200px;
-            padding-top: 1rem;
+            padding-top: 1.15rem;
             padding-bottom: 2rem;
             padding-left: 1rem;
             padding-right: 1rem;
         }
         h1, h2, h3 {
             color: var(--sg-text);
-            letter-spacing: 0.01em;
+            letter-spacing: -0.01em;
             font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
-            font-weight: 600;
+            font-weight: 620;
         }
-        h1 { font-size: 1.9rem; }
-        h2 { font-size: 1.35rem; }
+        h1 { font-size: 1.86rem; }
+        h2 { font-size: 1.34rem; }
         h3 { font-size: 1.08rem; }
         .stMarkdown, p, li, label, span {
             color: var(--sg-text);
         }
         .stMarkdown p {
-            margin-bottom: 0.5rem;
-            line-height: 1.45;
+            margin-bottom: 0.46rem;
+            line-height: 1.5;
         }
         hr {
             border-color: var(--sg-border);
@@ -379,13 +380,13 @@ def inject_global_styles() -> None:
             box-shadow: var(--sg-shadow-sm);
         }
         div[data-testid="stVerticalBlockBorderWrapper"] > div {
-            padding: 0.1rem;
+            padding: 0.18rem;
         }
         div[data-testid="stMetric"] {
-            background: var(--sg-surface-muted);
+            background: var(--sg-surface);
             border: 1px solid var(--sg-border);
             border-radius: var(--sg-radius-md);
-            padding: 0.55rem 0.75rem;
+            padding: 0.85rem 0.95rem;
         }
         div[data-testid="stMetricLabel"] {
             font-size: 0.7rem;
@@ -396,18 +397,33 @@ def inject_global_styles() -> None:
         }
         div[data-testid="stMetricValue"] {
             color: var(--sg-text);
-            font-size: 1.45rem;
-            font-weight: 650;
+            font-size: 1.4rem;
+            font-weight: 620;
         }
         div[data-testid="stDataEditor"] {
             border: 1px solid var(--sg-border);
             border-radius: var(--sg-radius-md);
-            padding: 0.2rem 0.28rem;
+            padding: 0.22rem 0.28rem;
             background: var(--sg-surface);
         }
         div[data-testid="stDataFrame"] {
             border: 1px solid var(--sg-border);
             border-radius: var(--sg-radius-md);
+        }
+        div[data-testid="stDataFrame"] [role="columnheader"],
+        div[data-testid="stDataEditor"] [role="columnheader"] {
+            background: var(--sg-surface-muted) !important;
+            color: var(--sg-muted-soft) !important;
+            font-size: 0.72rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--sg-border) !important;
+        }
+        div[data-testid="stDataFrame"] [role="gridcell"],
+        div[data-testid="stDataEditor"] [role="gridcell"] {
+            color: var(--sg-text) !important;
+            border-top: 1px solid rgba(228, 222, 210, 0.8) !important;
         }
         div[data-testid="stDateInput"] label,
         div[data-testid="stSelectbox"] label,
@@ -428,7 +444,7 @@ def inject_global_styles() -> None:
             border: 1px solid var(--sg-border) !important;
             border-radius: var(--sg-radius-sm) !important;
             box-shadow: none !important;
-            min-height: 2.55rem;
+            min-height: 2.7rem;
         }
         div[data-baseweb="select"] > div:hover,
         div[data-baseweb="input"] > div:hover,
@@ -438,8 +454,8 @@ def inject_global_styles() -> None:
         div[data-baseweb="select"] > div:focus-within,
         div[data-baseweb="input"] > div:focus-within,
         div[data-baseweb="textarea"] > div:focus-within {
-            border-color: var(--sg-primary) !important;
-            box-shadow: 0 0 0 1px var(--sg-primary-soft) !important;
+            border-color: #b9c8bf !important;
+            box-shadow: 0 0 0 3px rgba(219, 228, 222, 0.88) !important;
         }
         div[data-baseweb="select"] * {
             color: var(--sg-text) !important;
@@ -463,11 +479,11 @@ def inject_global_styles() -> None:
         .stFormSubmitButton > button {
             border-radius: var(--sg-radius-sm);
             border: 1px solid var(--sg-border);
-            padding: 0.45rem 0.82rem;
-            min-height: 2.4rem;
+            padding: 0.5rem 0.88rem;
+            min-height: 2.55rem;
             font-weight: 600;
-            letter-spacing: 0.01em;
-            background: #ffffff;
+            letter-spacing: 0;
+            background: var(--sg-surface);
             color: var(--sg-text);
             box-shadow: none;
             transition: all 120ms ease;
@@ -476,14 +492,14 @@ def inject_global_styles() -> None:
         .stButton > button[kind="primary"],
         .stFormSubmitButton > button[kind="primary"] {
             background: var(--sg-primary) !important;
-            border-color: var(--sg-border-strong) !important;
-            color: var(--sg-text) !important;
+            border-color: #c2cdc5 !important;
+            color: var(--sg-primary-ink) !important;
         }
         .stButton > button[kind="primary"]:hover,
         .stFormSubmitButton > button[kind="primary"]:hover {
             background: var(--sg-primary-strong) !important;
-            border-color: #b8bdc7 !important;
-            color: var(--sg-text) !important;
+            border-color: #b7c5bd !important;
+            color: var(--sg-primary-ink) !important;
             transform: translateY(-1px);
         }
         .stButton > button:hover,
@@ -494,7 +510,7 @@ def inject_global_styles() -> None:
         }
         .stCaption {
             color: var(--sg-muted);
-            font-size: 0.79rem;
+            font-size: 0.8rem;
         }
         div[data-testid="stAlert"] {
             border-radius: var(--sg-radius-md);
@@ -502,31 +518,31 @@ def inject_global_styles() -> None:
             background: var(--sg-surface-muted);
         }
         div[data-baseweb="tab-list"] {
-            gap: 0.45rem;
-            margin: 0.4rem 0 0.95rem 0;
+            gap: 0.5rem;
+            margin: 0.45rem 0 1rem 0;
             border-bottom: none;
-            padding: 0.2rem 0;
+            padding: 0.15rem 0;
         }
         button[data-baseweb="tab"] {
             border: 1px solid var(--sg-border) !important;
-            border-radius: var(--sg-radius-sm) !important;
-            padding: 0.38rem 0.64rem !important;
+            border-radius: 999px !important;
+            padding: 0.42rem 0.78rem !important;
             font-size: 0.84rem !important;
             font-weight: 600 !important;
             color: var(--sg-muted) !important;
-            background: var(--sg-surface-muted) !important;
+            background: var(--sg-surface) !important;
         }
         button[data-baseweb="tab"][aria-selected="true"] {
-            border-color: var(--sg-border-strong) !important;
-            background: var(--sg-surface) !important;
-            color: var(--sg-text) !important;
+            border-color: #c1cdc5 !important;
+            background: var(--sg-primary-soft) !important;
+            color: var(--sg-primary-ink) !important;
         }
         div[data-baseweb="tab-highlight"] {
             background: transparent !important;
         }
         .sg-page-header {
             margin: 0.2rem 0 1rem 0;
-            padding: 0.95rem 1rem;
+            padding: 1.05rem 1.08rem;
             border: 1px solid var(--sg-border);
             border-radius: var(--sg-radius-lg);
             background: var(--sg-surface);
@@ -542,32 +558,33 @@ def inject_global_styles() -> None:
         }
         .sg-page-title {
             margin: 0;
-            font-size: 1.48rem;
-            font-weight: 650;
+            font-size: 1.55rem;
+            font-weight: 620;
             line-height: 1.2;
             color: var(--sg-text);
         }
         .sg-page-subtitle {
-            margin: 0.28rem 0 0 0;
+            margin: 0.32rem 0 0 0;
             color: var(--sg-muted);
-            font-size: 0.92rem;
-            line-height: 1.4;
+            font-size: 0.94rem;
+            line-height: 1.48;
+            max-width: 70ch;
         }
         .sg-section-header {
-            margin: 0.15rem 0 0.6rem 0;
+            margin: 0.12rem 0 0.72rem 0;
         }
         .sg-section-title {
             margin: 0;
-            font-size: 1.02rem;
-            font-weight: 640;
+            font-size: 1.08rem;
+            font-weight: 620;
             color: var(--sg-text);
             line-height: 1.35;
         }
         .sg-section-description {
-            margin: 0.2rem 0 0 0;
+            margin: 0.24rem 0 0 0;
             color: var(--sg-muted);
-            font-size: 0.84rem;
-            line-height: 1.38;
+            font-size: 0.88rem;
+            line-height: 1.45;
         }
         .sg-inline-nav-title {
             font-size: 0.72rem;
@@ -575,47 +592,47 @@ def inject_global_styles() -> None:
             text-transform: uppercase;
             color: var(--sg-muted-soft);
             font-weight: 700;
-            margin: 0;
+            margin: 0 0 0.45rem 0;
         }
         .sg-status-badge {
             display: inline-flex;
             align-items: center;
             border-radius: 999px;
-            padding: 0.22rem 0.56rem;
+            padding: 0.24rem 0.58rem;
             font-size: 0.75rem;
-            font-weight: 650;
+            font-weight: 620;
             border: 1px solid transparent;
         }
         .sg-status-badge-done {
             background: var(--sg-success-soft);
             color: var(--sg-success-text);
-            border-color: #d4d9df;
+            border-color: #d7e2db;
         }
         .sg-status-badge-notdone {
-            background: var(--sg-surface-muted);
+            background: var(--sg-surface);
             color: var(--sg-muted);
             border-color: var(--sg-border);
         }
         .sg-status-badge-skipped {
             background: var(--sg-danger-soft);
             color: var(--sg-danger-text);
-            border-color: #d4d9df;
+            border-color: #ead9d3;
         }
         .sg-status-badge-postponed {
             background: var(--sg-warning-soft);
             color: var(--sg-warning-text);
-            border-color: #d4d9df;
+            border-color: #e8dcc1;
         }
         .sg-save-required,
         .sg-action-alert {
             border-radius: var(--sg-radius-sm);
             font-size: 0.81rem;
             font-weight: 600;
-            padding: 0.5rem 0.66rem;
-            margin: 0.28rem 0 0.6rem 0;
-            border: 1px solid #d8dbe1;
-            background: #f1f3f6;
-            color: #3f454d;
+            padding: 0.56rem 0.72rem;
+            margin: 0.32rem 0 0.68rem 0;
+            border: 1px solid #ddd8ce;
+            background: #f6f2eb;
+            color: #4c514c;
         }
         .sg-empty-state {
             border: 1px dashed var(--sg-border-strong);
@@ -639,7 +656,7 @@ def inject_global_styles() -> None:
         }
         .sg-selection-summary {
             margin: 0.4rem 0 0.25rem 0;
-            padding: 0.52rem 0.62rem;
+            padding: 0.66rem 0.74rem;
             border: 1px solid var(--sg-border);
             border-radius: var(--sg-radius-md);
             background: var(--sg-surface-muted);
@@ -653,17 +670,17 @@ def inject_global_styles() -> None:
             font-weight: 650;
         }
         .sg-selection-summary-main {
-            margin: 0.18rem 0 0 0;
+            margin: 0.22rem 0 0 0;
             color: var(--sg-text);
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             font-weight: 540;
-            line-height: 1.28;
+            line-height: 1.34;
         }
         .sg-selection-meta-grid {
-            margin-top: 0.34rem;
+            margin-top: 0.42rem;
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.26rem 0.46rem;
+            gap: 0.34rem 0.58rem;
         }
         .sg-selection-meta-item {
             margin: 0;
@@ -679,7 +696,7 @@ def inject_global_styles() -> None:
         }
         .sg-sunday-calendar-grid {
             display: block;
-            margin: 0.25rem 0 0.45rem 0;
+            margin: 0.25rem 0 0.55rem 0;
         }
         .sg-calendar-nav {
             display: flex;
@@ -691,34 +708,34 @@ def inject_global_styles() -> None:
         .sg-calendar-nav-label {
             margin: 0;
             font-size: 0.92rem;
-            font-weight: 650;
+            font-weight: 620;
             color: var(--sg-text);
             text-align: center;
             flex: 1;
         }
         .sg-sunday-month {
             border: 1px solid var(--sg-border);
-            border-radius: 12px;
+            border-radius: 16px;
             background: var(--sg-surface);
-            padding: 0.62rem;
+            padding: 0.8rem;
         }
         .sg-sunday-month-title {
-            margin: 0 0 0.42rem 0;
+            margin: 0 0 0.5rem 0;
             font-size: 0.9rem;
-            font-weight: 650;
+            font-weight: 620;
             color: var(--sg-text);
         }
         .sg-sunday-list {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 0.32rem;
+            gap: 0.44rem;
         }
         .sg-sunday-item {
-            border: 2px solid var(--sg-border);
-            border-radius: 10px;
-            padding: 0.42rem 0.52rem;
+            border: 1px solid var(--sg-border);
+            border-radius: 14px;
+            padding: 0.5rem 0.58rem;
             min-height: 0;
-            background: var(--sg-surface-muted);
+            background: var(--sg-surface);
             color: var(--sg-text);
         }
         .sg-sunday-item-link {
@@ -735,23 +752,24 @@ def inject_global_styles() -> None:
             box-shadow: var(--sg-shadow-sm);
         }
         .sg-sunday-item-has-meeting {
-            background: var(--sg-primary-soft);
+            background: var(--sg-surface);
             border-color: var(--sg-border-strong);
-            min-height: 98px;
-            padding: 0.48rem 0.56rem;
+            min-height: 118px;
+            padding: 0.62rem 0.68rem;
         }
         .sg-sunday-item-empty {
-            background: var(--sg-surface);
+            background: var(--sg-surface-muted);
             border-color: var(--sg-border);
             padding: 0.3rem 0.46rem;
         }
         .sg-sunday-item-selected {
-            border: 3px solid #7a7f87;
-            background: var(--sg-surface);
+            border-color: #b4c2b8;
+            background: var(--sg-primary-soft);
+            box-shadow: 0 0 0 2px rgba(219, 228, 222, 0.92);
         }
         .sg-sunday-date {
             margin: 0;
-            font-size: 0.78rem;
+            font-size: 0.82rem;
             font-weight: 620;
             line-height: 1.2;
         }
@@ -762,20 +780,26 @@ def inject_global_styles() -> None:
             line-height: 1.2;
         }
         .sg-sunday-details {
-            margin-top: 0.18rem;
+            margin-top: 0.24rem;
             display: grid;
-            gap: 0.12rem;
+            gap: 0.14rem;
         }
         .sg-sunday-detail-line {
             margin: 0;
-            font-size: 0.64rem;
-            line-height: 1.2;
-            color: var(--sg-text);
+            font-size: 0.63rem;
+            line-height: 1.18;
+            color: var(--sg-muted);
         }
         .sg-sunday-detail-line b {
             color: var(--sg-muted-soft);
             font-weight: 700;
             margin-right: 0.12rem;
+        }
+        .sg-sunday-pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.32rem;
         }
         .sg-sunday-empty-label {
             margin: 0.16rem 0 0 0;
@@ -783,6 +807,234 @@ def inject_global_styles() -> None:
             color: var(--sg-muted-soft);
             line-height: 1.15;
             font-weight: 600;
+        }
+        .sg-pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.38rem;
+            margin-top: 0.5rem;
+        }
+        .sg-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.24rem 0.62rem;
+            font-size: 0.74rem;
+            font-weight: 620;
+            border: 1px solid transparent;
+            line-height: 1.1;
+        }
+        .sg-pill-neutral {
+            background: var(--sg-surface-muted);
+            color: var(--sg-muted);
+            border-color: var(--sg-border);
+        }
+        .sg-pill-open {
+            background: #f2eee7;
+            color: #6a6258;
+            border-color: #ddd3c6;
+        }
+        .sg-pill-filled,
+        .sg-pill-ready {
+            background: var(--sg-primary-soft);
+            color: var(--sg-primary-ink);
+            border-color: #c8d4cc;
+        }
+        .sg-pill-soft {
+            background: var(--sg-surface);
+            color: var(--sg-muted);
+            border-color: var(--sg-border);
+        }
+        .sg-meeting-summary {
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius-lg);
+            background: var(--sg-surface-muted);
+            padding: 0.92rem 0.95rem;
+            margin: 0.12rem 0 0.85rem 0;
+        }
+        .sg-meeting-summary-kicker {
+            margin: 0;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-meeting-summary-title {
+            margin: 0.26rem 0 0 0;
+            font-size: 1.18rem;
+            font-weight: 620;
+            color: var(--sg-text);
+            line-height: 1.2;
+        }
+        .sg-meeting-summary-subtitle {
+            margin: 0.22rem 0 0 0;
+            color: var(--sg-muted);
+            font-size: 0.88rem;
+            line-height: 1.42;
+        }
+        .sg-service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.7rem;
+            margin-top: 0.8rem;
+        }
+        .sg-service-card {
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius-md);
+            background: var(--sg-surface);
+            padding: 0.82rem 0.86rem;
+        }
+        .sg-service-kicker {
+            margin: 0;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-service-title {
+            margin: 0.3rem 0 0 0;
+            font-size: 0.97rem;
+            font-weight: 620;
+            color: var(--sg-text);
+            line-height: 1.28;
+        }
+        .sg-service-detail {
+            margin: 0.24rem 0 0.56rem 0;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            color: var(--sg-muted);
+        }
+        .sg-calendar-shell {
+            overflow-x: auto;
+            margin: 0.25rem 0 0.6rem 0;
+            padding-bottom: 0.1rem;
+        }
+        .sg-calendar-month {
+            min-width: 760px;
+            border: 1px solid var(--sg-border);
+            border-radius: 16px;
+            background: var(--sg-surface);
+            padding: 0.85rem;
+        }
+        .sg-calendar-month-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.8rem;
+            margin-bottom: 0.75rem;
+        }
+        .sg-calendar-month-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 620;
+            color: var(--sg-text);
+        }
+        .sg-calendar-month-summary {
+            margin: 0;
+            font-size: 0.82rem;
+            color: var(--sg-muted);
+            white-space: nowrap;
+        }
+        .sg-calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.42rem;
+            margin-bottom: 0.4rem;
+        }
+        .sg-calendar-weekday {
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            padding: 0 0.14rem;
+        }
+        .sg-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.42rem;
+        }
+        .sg-calendar-day-link {
+            display: block;
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+        .sg-calendar-day {
+            min-height: 108px;
+            border: 1px solid var(--sg-border);
+            border-radius: 12px;
+            background: var(--sg-surface-muted);
+            padding: 0.36rem 0.4rem;
+            transition: transform 100ms ease, box-shadow 100ms ease, border-color 100ms ease;
+        }
+        .sg-calendar-day-in-month {
+            background: var(--sg-surface);
+        }
+        .sg-calendar-day-outside {
+            border-color: transparent;
+            background: transparent;
+        }
+        .sg-calendar-day-clickable {
+            cursor: pointer;
+        }
+        .sg-calendar-day-clickable:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--sg-shadow-sm);
+            border-color: #b4c2b8;
+        }
+        .sg-calendar-day-has-meeting {
+            background: var(--sg-primary-soft);
+            border-color: #c1cdc5;
+        }
+        .sg-calendar-day-ready {
+            background: var(--sg-primary);
+            border-color: #b6c4bb;
+        }
+        .sg-calendar-day-selected {
+            box-shadow: 0 0 0 2px rgba(219, 228, 222, 0.92);
+            border-color: #8fa397;
+        }
+        .sg-calendar-day-number {
+            margin: 0;
+            font-size: 0.76rem;
+            font-weight: 620;
+            color: var(--sg-text);
+            line-height: 1.1;
+        }
+        .sg-calendar-day-outside .sg-calendar-day-number {
+            color: transparent;
+        }
+        .sg-calendar-day-title {
+            margin: 0.28rem 0 0 0;
+            font-size: 0.64rem;
+            line-height: 1.18;
+            color: var(--sg-muted);
+            font-weight: 520;
+        }
+        .sg-calendar-day-caption {
+            margin: 0.12rem 0 0 0;
+            font-size: 0.6rem;
+            line-height: 1.12;
+            color: var(--sg-muted);
+        }
+        .sg-calendar-day-pill {
+            margin-top: 0.18rem;
+        }
+        .sg-calendar-day-detail {
+            margin: 0.11rem 0 0 0;
+            font-size: 0.58rem;
+            line-height: 1.14;
+            color: var(--sg-muted);
+        }
+        .sg-calendar-day-detail strong {
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-calendar-day-pill .sg-pill {
+            padding: 0.18rem 0.44rem;
+            font-size: 0.64rem;
         }
         .sg-lesson-rolodex-scroll {
             display: flex;
@@ -807,7 +1059,7 @@ def inject_global_styles() -> None:
             background: var(--sg-surface);
             color: var(--sg-text) !important;
             text-decoration: none !important;
-            padding: 0.54rem 0.56rem;
+            padding: 0.66rem 0.68rem;
             box-shadow: var(--sg-shadow-sm);
             flex: 0 0 auto;
             transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
@@ -819,7 +1071,7 @@ def inject_global_styles() -> None:
         }
         .sg-lesson-card.selected {
             background: var(--sg-primary-soft);
-            border-color: var(--sg-primary);
+            border-color: #c1cdc5;
             color: var(--sg-text) !important;
         }
         .sg-lesson-card-title {
@@ -841,8 +1093,8 @@ def inject_global_styles() -> None:
             margin: 0.1rem 0 0.6rem 0;
         }
         .sg-lesson-title {
-            font-size: 1.3rem;
-            font-weight: 650;
+            font-size: 1.34rem;
+            font-weight: 620;
             line-height: 1.2;
             color: var(--sg-text);
             margin: 0.02rem 0 0.1rem 0;
@@ -851,9 +1103,9 @@ def inject_global_styles() -> None:
         .sg-lesson-section {
             border: 1px solid var(--sg-border);
             border-radius: var(--sg-radius-md);
-            background: var(--sg-surface);
-            padding: 0.62rem 0.75rem;
-            margin: 0.38rem 0;
+            background: var(--sg-surface-muted);
+            padding: 0.72rem 0.82rem;
+            margin: 0.44rem 0;
         }
         .sg-lesson-section-title {
             font-size: 0.69rem;
@@ -1018,16 +1270,26 @@ def inject_global_styles() -> None:
                 font-size: 0.86rem;
             }
             .sg-page-header {
-                padding: 0.75rem 0.78rem;
+                padding: 0.82rem 0.86rem;
             }
             .sg-page-title {
-                font-size: 1.24rem;
+                font-size: 1.28rem;
             }
             .sg-sunday-list {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
             .sg-selection-meta-grid {
                 grid-template-columns: 1fr;
+            }
+            .sg-service-grid {
+                grid-template-columns: 1fr;
+            }
+            .sg-calendar-month {
+                min-width: 700px;
+            }
+            .sg-calendar-day {
+                min-height: 100px;
+                padding: 0.32rem 0.36rem;
             }
             section[data-testid="stSidebar"] .stButton > button {
                 min-height: 2.12rem;
@@ -1514,8 +1776,21 @@ def fetch_upcoming_meetings(lessons_df: pd.DataFrame) -> pd.DataFrame:
     with get_connection() as conn:
         upcoming_df = pd.read_sql_query(
             """
-            SELECT id, meeting_date, lesson_week, host_name, facilitator_name, notes, main_meal
-            FROM upcoming_meetings
+            SELECT
+                u.id,
+                u.meeting_date,
+                u.lesson_week,
+                u.host_name,
+                u.facilitator_name,
+                u.notes,
+                u.main_meal,
+                COALESCE(m.signup_count, 0) AS meal_signup_count
+            FROM upcoming_meetings u
+            LEFT JOIN (
+                SELECT upcoming_meeting_id, COUNT(*) AS signup_count
+                FROM upcoming_meal_signups
+                GROUP BY upcoming_meeting_id
+            ) m ON m.upcoming_meeting_id = u.id
             WHERE meeting_date >= ?
             ORDER BY meeting_date ASC, id ASC
             """,
@@ -1534,6 +1809,7 @@ def fetch_upcoming_meetings(lessons_df: pd.DataFrame) -> pd.DataFrame:
                 "facilitator_name",
                 "notes",
                 "main_meal",
+                "meal_signup_count",
             ]
         )
 
@@ -1544,6 +1820,7 @@ def fetch_upcoming_meetings(lessons_df: pd.DataFrame) -> pd.DataFrame:
 
     for col in ["host_name", "facilitator_name", "notes", "main_meal"]:
         upcoming_df[col] = upcoming_df[col].fillna("")
+    upcoming_df["meal_signup_count"] = upcoming_df["meal_signup_count"].fillna(0).astype(int)
 
     return upcoming_df[
         [
@@ -1555,6 +1832,7 @@ def fetch_upcoming_meetings(lessons_df: pd.DataFrame) -> pd.DataFrame:
             "facilitator_name",
             "notes",
             "main_meal",
+            "meal_signup_count",
         ]
     ]
 
@@ -1593,6 +1871,143 @@ def normalize_meal_rows(rows: List[dict]) -> List[Tuple[str, str]]:
     return normalized
 
 
+def is_open_assignment(value: str) -> bool:
+    normalized = str(value or "").strip()
+    return not normalized or normalized == TBD_OPTION
+
+
+def summarize_upcoming_meeting(row: dict) -> Dict[str, object]:
+    host_name = str(row.get("host_name", "")).strip()
+    facilitator_name = str(row.get("facilitator_name", "")).strip()
+    lesson_title = str(row.get("lesson_theme", "")).strip() or "(Lesson not assigned)"
+    main_meal = str(row.get("main_meal", "")).strip()
+    meal_signup_count = int(row.get("meal_signup_count", 0) or 0)
+
+    host_open = is_open_assignment(host_name)
+    facilitator_open = is_open_assignment(facilitator_name)
+
+    open_needs: List[str] = []
+    if host_open:
+        open_needs.append("Host")
+    if facilitator_open:
+        open_needs.append("Facilitator")
+    if not main_meal:
+        open_needs.append("Main meal")
+    elif meal_signup_count == 0:
+        open_needs.append("Meal support")
+
+    if open_needs:
+        overall_label = (
+            "Open opportunity"
+            if len(open_needs) == 1
+            else f"Open needs: {', '.join(open_needs[:2])}"
+        )
+        overall_tone = "open"
+    else:
+        overall_label = "Ready for the week"
+        overall_tone = "ready"
+
+    if host_open:
+        host_display = "Open opportunity"
+        host_note = "Still needs a host"
+        host_tone = "open"
+    else:
+        host_display = host_name
+        host_note = "Hosting is covered"
+        host_tone = "filled"
+
+    if facilitator_open:
+        facilitator_display = "Open opportunity"
+        facilitator_note = "Still needs a facilitator"
+        facilitator_tone = "open"
+    else:
+        facilitator_display = facilitator_name
+        facilitator_note = "Facilitator is covered"
+        facilitator_tone = "filled"
+
+    if main_meal:
+        meal_display = main_meal
+        if meal_signup_count > 0:
+            meal_note = f"{meal_signup_count} food sign-up{'s' if meal_signup_count != 1 else ''}"
+            meal_tone = "filled"
+        else:
+            meal_note = "Sides, desserts, and drinks are still open"
+            meal_tone = "open"
+    else:
+        meal_display = "Meal plan still open"
+        meal_note = "Host can set the main meal and others can support it"
+        meal_tone = "open"
+
+    return {
+        "host_display": host_display,
+        "host_note": host_note,
+        "host_tone": host_tone,
+        "facilitator_display": facilitator_display,
+        "facilitator_note": facilitator_note,
+        "facilitator_tone": facilitator_tone,
+        "meal_display": meal_display,
+        "meal_note": meal_note,
+        "meal_tone": meal_tone,
+        "lesson_title": lesson_title,
+        "main_meal": main_meal,
+        "meal_signup_count": meal_signup_count,
+        "overall_label": overall_label,
+        "overall_tone": overall_tone,
+        "open_needs": open_needs,
+    }
+
+
+def render_support_pill(label: str, tone: str = "neutral") -> str:
+    return f"<span class='sg-pill sg-pill-{escape(tone)}'>{escape(label)}</span>"
+
+
+def render_selected_meeting_summary(row: dict) -> None:
+    summary = summarize_upcoming_meeting(row)
+    date_label = format_meeting_date(str(row.get("meeting_date", "")))
+    lesson_week = int(row.get("lesson_week", 0) or 0)
+    lesson_label = f"Lesson {lesson_week}" if lesson_week > 0 else "Lesson"
+    lesson_title = str(summary["lesson_title"]).strip()
+
+    status_pills = [render_support_pill(str(summary["overall_label"]), str(summary["overall_tone"]))]
+    if summary["overall_tone"] == "ready":
+        status_pills.append(render_support_pill("Thanks for serving", "soft"))
+
+    st.markdown(
+        (
+            "<div class='sg-meeting-summary'>"
+            "<div class='sg-meeting-summary-head'>"
+            "<p class='sg-meeting-summary-kicker'>Selected gathering</p>"
+            f"<p class='sg-meeting-summary-title'>{escape(date_label)}</p>"
+            f"<p class='sg-meeting-summary-subtitle'>{escape(lesson_label)}"
+            f"{escape(' - ' + lesson_title) if lesson_title else ''}</p>"
+            f"<div class='sg-pill-row'>{''.join(status_pills)}</div>"
+            "</div>"
+            "<div class='sg-service-grid'>"
+            "<div class='sg-service-card'>"
+            "<p class='sg-service-kicker'>Hosting</p>"
+            f"<p class='sg-service-title'>{escape(str(summary['host_display']))}</p>"
+            f"<p class='sg-service-detail'>{escape(str(summary['host_note']))}</p>"
+            f"{render_support_pill('Host', str(summary['host_tone']))}"
+            "</div>"
+            "<div class='sg-service-card'>"
+            "<p class='sg-service-kicker'>Facilitating</p>"
+            f"<p class='sg-service-title'>{escape(str(summary['facilitator_display']))}</p>"
+            f"<p class='sg-service-detail'>{escape(str(summary['facilitator_note']))}</p>"
+            f"{render_support_pill('Facilitator', str(summary['facilitator_tone']))}"
+            "</div>"
+            "<div class='sg-service-card'>"
+            "<p class='sg-service-kicker'>Meal Support</p>"
+            f"<p class='sg-service-title'>{escape(str(summary['meal_display']))}</p>"
+            f"<p class='sg-service-detail'>{escape(str(summary['meal_note']))}</p>"
+            f"{render_support_pill('Meal', str(summary['meal_tone']))}"
+            "</div>"
+            "</div>"
+            "</div>"
+        ),
+        unsafe_allow_html=True,
+    )
+
+
 def save_upcoming_meal_signups(upcoming_meeting_id: int, rows: List[dict]) -> int:
     saved_count = 0
     with get_connection() as conn:
@@ -1629,9 +2044,6 @@ def render_upcoming_calendar(
         st.info("No upcoming dates yet.")
         return
 
-    counts_by_date: Dict[date, int] = {}
-    for d in parsed_dates:
-        counts_by_date[d] = counts_by_date.get(d, 0) + 1
     meetings_by_date: Dict[date, List[dict]] = {}
     for row in upcoming_df.to_dict(orient="records"):
         raw_date = str(row.get("meeting_date", "")).strip()
@@ -1720,72 +2132,117 @@ def render_upcoming_calendar(
             st.rerun()
 
     month_label = f"{month_name[active_month.month]} {active_month.year}"
-    weeks = monthcalendar(active_month.year, active_month.month)
-    sunday_days = [int(week[6]) for week in weeks if int(week[6]) > 0]
-    sunday_items: List[str] = []
-    for sunday_day in sunday_days:
-        sunday_date = date(active_month.year, active_month.month, sunday_day)
-        has_meeting = sunday_date in upcoming_days
-        is_selected = selected_date_obj is not None and sunday_date == selected_date_obj
-        classes = ["sg-sunday-item"]
-        if has_meeting:
-            classes.append("sg-sunday-item-has-meeting")
-        else:
-            classes.append("sg-sunday-item-empty")
-        if is_selected:
-            classes.append("sg-sunday-item-selected")
-        details_html = ""
-        empty_html = ""
-        card_open = ""
-        card_close = ""
-        if has_meeting:
-            detail_rows: List[str] = []
-            meeting_rows_for_date = meetings_by_date.get(sunday_date, [])
-            target_id: int | None = None
-            if meeting_rows_for_date:
-                try:
-                    target_id = int(meeting_rows_for_date[0].get("id"))
-                except Exception:
-                    target_id = None
-            if target_id is not None:
-                classes.append("sg-sunday-item-clickable")
-                card_open = (
-                    f"<a class='sg-sunday-item-link' href='?dashboard_pick={int(target_id)}' target='_self'>"
-                )
-                card_close = "</a>"
-            for meeting_row in meeting_rows_for_date:
-                host = str(meeting_row.get("host_name", "")).strip() or TBD_OPTION
-                facilitator = str(meeting_row.get("facilitator_name", "")).strip() or TBD_OPTION
-                lesson_title = str(meeting_row.get("lesson_theme", "")).strip() or "(No lesson)"
-                detail_rows.extend(
-                    [
-                        f"<p class='sg-sunday-detail-line'><b>Host:</b> {escape(host)}</p>",
-                        f"<p class='sg-sunday-detail-line'><b>Facilitator:</b> {escape(facilitator)}</p>",
-                        f"<p class='sg-sunday-detail-line'><b>Lesson:</b> {escape(lesson_title)}</p>",
-                    ]
-                )
-            details_html = f"<div class='sg-sunday-details'>{''.join(detail_rows)}</div>"
-        else:
-            empty_html = "<p class='sg-sunday-empty-label'>No Gathering</p>"
-        sunday_items.append(
-            (
-                f"{card_open}<div class='{' '.join(classes)}'>"
-                f"<p class='sg-sunday-date'>{sunday_date.strftime('%b %d, %Y')}</p>"
-                f"{details_html}{empty_html}"
-                f"</div>{card_close}"
-            )
+    month_rows = [
+        row
+        for row in upcoming_df.to_dict(orient="records")
+        if str(row.get("meeting_date", "")).startswith(
+            f"{active_month.year:04d}-{active_month.month:02d}-"
+        )
+    ]
+    month_gathering_count = len(month_rows)
+    month_open_need_count = len(
+        [row for row in month_rows if summarize_upcoming_meeting(row).get("open_needs")]
+    )
+    month_summary = f"{month_gathering_count} gathering{'s' if month_gathering_count != 1 else ''}"
+    if month_open_need_count:
+        month_summary = (
+            f"{month_summary} • {month_open_need_count} with open needs"
         )
 
-    st.caption(
-        "Sunday planning view. Swipe month using Prev/Next. Selected date is outlined."
+    weekday_labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    weekday_html = "".join(
+        f"<div class='sg-calendar-weekday'>{label}</div>" for label in weekday_labels
     )
+
+    month_weeks = Calendar(firstweekday=6).monthdatescalendar(active_month.year, active_month.month)
+    day_cells: List[str] = []
+
+    for week in month_weeks:
+        for calendar_day in week:
+            in_month = calendar_day.month == active_month.month
+            has_meeting = calendar_day in upcoming_days
+            is_selected = selected_date_obj is not None and calendar_day == selected_date_obj
+            classes = ["sg-calendar-day"]
+            if in_month:
+                classes.append("sg-calendar-day-in-month")
+            else:
+                classes.append("sg-calendar-day-outside")
+            if has_meeting:
+                classes.append("sg-calendar-day-has-meeting")
+            if is_selected:
+                classes.append("sg-calendar-day-selected")
+
+            card_open = ""
+            card_close = ""
+            title_html = ""
+            caption_html = ""
+            pill_html = ""
+
+            if has_meeting:
+                meeting_rows_for_date = meetings_by_date.get(calendar_day, [])
+                summary = summarize_upcoming_meeting(meeting_rows_for_date[0]) if meeting_rows_for_date else {}
+                target_id: int | None = None
+                if meeting_rows_for_date:
+                    try:
+                        target_id = int(meeting_rows_for_date[0].get("id"))
+                    except Exception:
+                        target_id = None
+                if target_id is not None:
+                    classes.append("sg-calendar-day-clickable")
+                    card_open = (
+                        f"<a class='sg-calendar-day-link' href='?dashboard_pick={int(target_id)}#meeting-details' target='_self'>"
+                    )
+                    card_close = "</a>"
+
+                if str(summary.get("overall_tone", "")) == "ready":
+                    classes.append("sg-calendar-day-ready")
+
+                host_text = str(summary.get("host_display", "")).strip() or "Open"
+                facilitator_text = (
+                    str(summary.get("facilitator_display", "")).strip() or "Open"
+                )
+                lesson_text = str(summary.get("lesson_title", "")).strip() or "Gathering"
+                if len(host_text) > 15:
+                    host_text = host_text[:12].rstrip() + "..."
+                if len(facilitator_text) > 15:
+                    facilitator_text = facilitator_text[:12].rstrip() + "..."
+                if len(lesson_text) > 18:
+                    lesson_text = lesson_text[:15].rstrip() + "..."
+
+                title_html = (
+                    f"<p class='sg-calendar-day-detail'><strong>Host:</strong> {escape(host_text)}</p>"
+                )
+                caption_html = (
+                    f"<p class='sg-calendar-day-detail'><strong>Facilitator:</strong> {escape(facilitator_text)}</p>"
+                    f"<p class='sg-calendar-day-detail'><strong>Lesson:</strong> {escape(lesson_text)}</p>"
+                    "<p class='sg-calendar-day-caption'>Click for more details</p>"
+                )
+                pill_label = "Open" if summary.get("open_needs") else "Ready"
+                pill_tone = "open" if summary.get("open_needs") else "ready"
+                pill_html = (
+                    f"<div class='sg-calendar-day-pill'>{render_support_pill(pill_label, pill_tone)}</div>"
+                )
+
+            day_cells.append(
+                (
+                    f"{card_open}<div class='{' '.join(classes)}'>"
+                    f"<p class='sg-calendar-day-number'>{calendar_day.day}</p>"
+                    f"{title_html}{caption_html}{pill_html}"
+                    f"</div>{card_close}"
+                )
+            )
+
+    st.caption("Choose a gathering date to open its serving details below.")
     month_html = (
-        "<div class='sg-sunday-calendar-grid'>"
-        "<div class='sg-sunday-month'>"
-        f"<p class='sg-sunday-month-title'>{month_label}</p>"
-        "<div class='sg-sunday-list'>"
-        f"{''.join(sunday_items)}"
-        "</div></div></div>"
+        "<div class='sg-calendar-shell'>"
+        "<div class='sg-calendar-month'>"
+        "<div class='sg-calendar-month-header'>"
+        f"<p class='sg-calendar-month-title'>{month_label}</p>"
+        f"<p class='sg-calendar-month-summary'>{escape(month_summary)}</p>"
+        "</div>"
+        f"<div class='sg-calendar-weekdays'>{weekday_html}</div>"
+        f"<div class='sg-calendar-grid'>{''.join(day_cells)}</div>"
+        "</div></div>"
     )
     st.markdown(month_html, unsafe_allow_html=True)
 
@@ -2273,12 +2730,6 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
         else (suggested_week if suggested_week is not None else weeks[0])
     )
 
-    render_page_header(
-        "MCOC Small Group",
-        "Plan meetings, assign roles, coordinate meals, and log completion from one place.",
-        "Home",
-    )
-
     if upcoming_df.empty:
         with st.container(border=True):
             render_empty_state(
@@ -2315,7 +2766,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
     with st.container(border=True):
         render_section_header(
             "Upcoming Meeting Dates",
-            "Choose a meeting date. The details panel below always edits the selected date.",
+            "Choose a gathering to see who is serving, what meal is planned, and what still needs coverage.",
         )
         ordered_ids = [int(row["id"]) for row in date_rows]
         selected_calendar_date = ""
@@ -2338,7 +2789,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
 
         selected_index = ordered_ids.index(selected_id) if selected_id in ordered_ids else 0
         picked_id = st.selectbox(
-            "Selected meeting date",
+            "Gathering to update",
             options=ordered_ids,
             index=selected_index,
             format_func=date_selector_label,
@@ -2349,7 +2800,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
             st.rerun()
 
         if st.button(
-            "Add another meeting date",
+            "Manage gathering dates",
             key="dashboard_go_admin_add_meeting",
             use_container_width=True,
         ):
@@ -2358,6 +2809,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
 
     selected_id = int(st.session_state["dashboard_selected_upcoming_id"])
     selected_row = upcoming_df[upcoming_df["id"] == selected_id].iloc[0]
+    selected_summary = summarize_upcoming_meeting(selected_row.to_dict())
     selected_meeting_date = str(selected_row["meeting_date"])
     try:
         meal_date_label = date.fromisoformat(selected_meeting_date).strftime("%m/%d/%y")
@@ -2405,183 +2857,173 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
             return f"{base} ({' | '.join(markers)})"
         return base
 
+    st.markdown("<div id='meeting-details'></div>", unsafe_allow_html=True)
     with st.container(border=True):
         render_section_header(
             f"Meeting Details: {format_meeting_date(selected_meeting_date)}",
-            "Primary action: sign up for roles and food first, then adjust lesson details if needed.",
+            "Start with the serving needs below. Hosting, facilitating, and meal support all update this gathering.",
         )
-        selected_lesson_theme = str(theme_lookup.get(int(selected_row["lesson_week"]), "")).strip()
-        meal_df_for_summary = fetch_upcoming_meal_signups(selected_id)
-        meal_signup_count = len(
-            normalize_meal_rows(meal_df_for_summary.to_dict(orient="records"))
-        )
-        st.markdown(
-            (
-                "<div class='sg-selection-summary'>"
-                "<p class='sg-selection-summary-title'>Currently Editing</p>"
-                f"<p class='sg-selection-summary-main'>{escape(format_meeting_date(selected_meeting_date))} · "
-                f"Lesson {int(selected_row['lesson_week'])}"
-                f"{escape(' - ' + selected_lesson_theme) if selected_lesson_theme else ''}</p>"
-                "<div class='sg-selection-meta-grid'>"
-                "<p class='sg-selection-meta-item'>"
-                "<span class='sg-selection-meta-label'>Host</span>"
-                f"{escape(host_default_selection)}"
-                "</p>"
-                "<p class='sg-selection-meta-item'>"
-                "<span class='sg-selection-meta-label'>Facilitator</span>"
-                f"{escape(facilitator_default_selection)}"
-                "</p>"
-                "<p class='sg-selection-meta-item'>"
-                "<span class='sg-selection-meta-label'>Main Meal</span>"
-                f"{escape(saved_main_meal if saved_main_meal else 'Not set')}"
-                "</p>"
-                "<p class='sg-selection-meta-item'>"
-                "<span class='sg-selection-meta-label'>Food Signups</span>"
-                f"{int(meal_signup_count)}"
-                "</p>"
-                "</div>"
-                "</div>"
-            ),
-            unsafe_allow_html=True,
-        )
-        tab_signup, tab_details, tab_complete = st.tabs(
-            ["Sign Up (Roles + Food)", "Meeting Details", "Complete"]
-        )
+        render_selected_meeting_summary(selected_row.to_dict())
+        tab_signup, tab_details, tab_complete = st.tabs(["Serve", "Details", "Complete"])
 
         with tab_signup:
-            render_section_header(
-                "Role Sign-up",
-                "Select who is hosting and facilitating for this meeting date.",
-            )
-            people_left, people_right = st.columns(2)
-            with people_left:
-                host_select = st.selectbox(
-                    "Host",
-                    options=dashboard_person_options,
-                    index=dashboard_person_options.index(host_default_selection),
-                    key=f"dashboard_host_select_{selected_id}",
-                )
-            with people_right:
-                facilitator_select = st.selectbox(
-                    "Facilitator",
-                    options=dashboard_person_options,
-                    index=dashboard_person_options.index(facilitator_default_selection),
-                    key=f"dashboard_facilitator_select_{selected_id}",
-                )
-            main_meal_input = st.text_input(
-                "Main meal provided by host",
-                value=saved_main_meal,
-                key=f"dashboard_main_meal_{selected_id}",
-                placeholder="Example: Taco bar, Lasagna, BBQ chicken",
-            )
-
-            role_has_unsaved_changes = (
-                str(host_select) != str(host_default_selection)
-                or str(facilitator_select) != str(facilitator_default_selection)
-                or str(main_meal_input).strip() != str(saved_main_meal)
-            )
-            if role_has_unsaved_changes:
-                st.markdown(
-                    (
-                        "<div class='sg-save-required'>"
-                        "Role changes are unsaved. Click <b>Save role sign-up</b>."
-                        "</div>"
-                    ),
-                    unsafe_allow_html=True,
-                )
-
-            if st.button(
-                "Save role sign-up",
-                key=f"dashboard_save_roles_{selected_id}",
-                type="primary",
-                use_container_width=True,
-            ):
-                if not role_has_unsaved_changes:
-                    notify("No role sign-up changes to save.", "info")
-                else:
-                    current_lesson_week = int(
-                        st.session_state.get(
-                            f"dashboard_lesson_select_{selected_id}",
-                            lesson_default_week,
+            serve_col, meal_col = st.columns([1.0, 1.15])
+            with serve_col:
+                with st.container(border=True):
+                    render_section_header(
+                        "Serve this gathering",
+                        "Sign up to host or facilitate so everyone can quickly see what is covered.",
+                    )
+                    if selected_summary["open_needs"]:
+                        st.markdown(
+                            (
+                                "<div class='sg-pill-row'>"
+                                + "".join(
+                                    render_support_pill(f"Needs {need}", "open")
+                                    for need in selected_summary["open_needs"][:3]
+                                )
+                                + "</div>"
+                            ),
+                            unsafe_allow_html=True,
                         )
-                    )
-                    current_notes = str(
-                        st.session_state.get(
-                            f"dashboard_notes_{selected_id}",
-                            original_notes,
+                    else:
+                        st.markdown(
+                            f"<div class='sg-pill-row'>{render_support_pill('All key roles are covered', 'ready')}</div>",
+                            unsafe_allow_html=True,
                         )
-                    )
-                    update_upcoming_meeting(
-                        selected_id,
-                        current_lesson_week,
-                        str(host_select),
-                        str(facilitator_select),
-                        current_notes,
-                        str(main_meal_input).strip(),
-                    )
-                    queue_message("Role sign-up saved.")
-                    st.rerun()
 
-            saved_or_current_main_meal = str(
-                st.session_state.get(
-                    f"dashboard_main_meal_{selected_id}",
-                    saved_main_meal,
-                )
-            ).strip()
-            render_section_header(
-                f"Food Sign-up ({meal_date_label})",
-                (
-                    f"Main meal: {saved_or_current_main_meal}. Add sides, desserts, and drinks."
-                    if saved_or_current_main_meal
-                    else "Add each family and what they are bringing."
-                ),
-            )
-            meal_df = fetch_upcoming_meal_signups(selected_id)
-            original_meal_rows = normalize_meal_rows(meal_df.to_dict(orient="records"))
-            meal_editor_df = st.data_editor(
-                meal_df,
-                hide_index=True,
-                use_container_width=True,
-                num_rows="dynamic",
-                height=194,
-                column_order=["Name", "Dish"],
-                column_config={
-                    "Name": st.column_config.TextColumn("Name", width="medium"),
-                    "Dish": st.column_config.TextColumn("Dish", width="large"),
-                },
-                key=f"dashboard_meal_editor_{selected_id}",
-            )
-            edited_meal_rows = normalize_meal_rows(meal_editor_df.to_dict(orient="records"))
-            meal_has_unsaved_changes = edited_meal_rows != original_meal_rows
+                    people_left, people_right = st.columns(2)
+                    with people_left:
+                        host_select = st.selectbox(
+                            "Sign up to host",
+                            options=dashboard_person_options,
+                            index=dashboard_person_options.index(host_default_selection),
+                            key=f"dashboard_host_select_{selected_id}",
+                        )
+                    with people_right:
+                        facilitator_select = st.selectbox(
+                            "Facilitate this lesson",
+                            options=dashboard_person_options,
+                            index=dashboard_person_options.index(facilitator_default_selection),
+                            key=f"dashboard_facilitator_select_{selected_id}",
+                        )
 
-            if meal_has_unsaved_changes:
-                st.markdown(
-                    (
-                        "<div class='sg-save-required'>"
-                        "Food sign-up changes are unsaved. Click <b>Save food sign-up</b>."
-                        "</div>"
-                    ),
-                    unsafe_allow_html=True,
-                )
-
-            if st.button(
-                "Save food sign-up",
-                key=f"dashboard_save_meal_{selected_id}",
-                use_container_width=True,
-            ):
-                if not meal_has_unsaved_changes:
-                    notify("No food sign-up changes to save.", "info")
-                else:
-                    saved_entries = save_upcoming_meal_signups(
-                        selected_id, meal_editor_df.to_dict(orient="records")
+                    role_has_unsaved_changes = (
+                        str(host_select) != str(host_default_selection)
+                        or str(facilitator_select) != str(facilitator_default_selection)
                     )
-                    queue_message(f"Food sign-up saved ({saved_entries} entries).")
-                    st.rerun()
+                    if role_has_unsaved_changes:
+                        st.markdown(
+                            "<div class='sg-save-required'>Serving updates are ready to save.</div>",
+                            unsafe_allow_html=True,
+                        )
+
+                    if st.button(
+                        "Save hosting and facilitator",
+                        key=f"dashboard_save_roles_{selected_id}",
+                        type="primary",
+                        use_container_width=True,
+                    ):
+                        if not role_has_unsaved_changes:
+                            notify("Everything is already up to date.", "info")
+                        else:
+                            current_lesson_week = int(
+                                st.session_state.get(
+                                    f"dashboard_lesson_select_{selected_id}",
+                                    lesson_default_week,
+                                )
+                            )
+                            current_notes = str(
+                                st.session_state.get(
+                                    f"dashboard_notes_{selected_id}",
+                                    original_notes,
+                                )
+                            )
+                            update_upcoming_meeting(
+                                selected_id,
+                                current_lesson_week,
+                                str(host_select),
+                                str(facilitator_select),
+                                current_notes,
+                                saved_main_meal,
+                            )
+                            queue_message("Thanks for serving. Hosting details were saved.")
+                            st.rerun()
+
+            with meal_col:
+                with st.container(border=True):
+                    meal_intro = (
+                        f"Main meal: {saved_main_meal}. Invite sides, desserts, and drinks below."
+                        if saved_main_meal
+                        else "Add the main meal first, then invite others to bring sides, desserts, or drinks."
+                    )
+                    render_section_header(
+                        f"Bring a meal ({meal_date_label})",
+                        meal_intro,
+                    )
+                    main_meal_input = st.text_input(
+                        "Main meal provided by host",
+                        value=saved_main_meal,
+                        key=f"dashboard_main_meal_{selected_id}",
+                        placeholder="Examples: Taco bar, Soup and salad, Baked ziti",
+                    )
+
+                    meal_df = fetch_upcoming_meal_signups(selected_id)
+                    original_meal_rows = normalize_meal_rows(meal_df.to_dict(orient="records"))
+                    meal_editor_df = st.data_editor(
+                        meal_df,
+                        hide_index=True,
+                        use_container_width=True,
+                        num_rows="dynamic",
+                        height=210,
+                        column_order=["Name", "Dish"],
+                        column_config={
+                            "Name": st.column_config.TextColumn("Who is bringing food", width="medium"),
+                            "Dish": st.column_config.TextColumn("Item", width="large"),
+                        },
+                        key=f"dashboard_meal_editor_{selected_id}",
+                    )
+                    edited_meal_rows = normalize_meal_rows(meal_editor_df.to_dict(orient="records"))
+                    meal_has_unsaved_changes = (
+                        edited_meal_rows != original_meal_rows
+                        or str(main_meal_input).strip() != str(saved_main_meal)
+                    )
+
+                    if meal_has_unsaved_changes:
+                        st.markdown(
+                            "<div class='sg-save-required'>Meal updates are ready to save.</div>",
+                            unsafe_allow_html=True,
+                        )
+
+                    if st.button(
+                        "Save meal support",
+                        key=f"dashboard_save_meal_{selected_id}",
+                        type="primary",
+                        use_container_width=True,
+                    ):
+                        if not meal_has_unsaved_changes:
+                            notify("Everything is already up to date.", "info")
+                        else:
+                            update_upcoming_meeting(
+                                selected_id,
+                                lesson_default_week,
+                                saved_host,
+                                saved_facilitator,
+                                original_notes,
+                                str(main_meal_input).strip(),
+                            )
+                            saved_entries = save_upcoming_meal_signups(
+                                selected_id, meal_editor_df.to_dict(orient="records")
+                            )
+                            queue_message(
+                                f"Thanks for serving. Meal support was updated ({saved_entries} item{'s' if saved_entries != 1 else ''})."
+                            )
+                            st.rerun()
 
         with tab_details:
             render_section_header(
                 "Meeting Details",
-                "Edit lesson assignment and meeting notes for this selected date.",
+                "Update lesson assignment and any notes the group should remember for this date.",
             )
             date_col, lesson_col = st.columns([0.95, 1.45])
             with date_col:
@@ -2605,11 +3047,11 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                         st.caption(f"Other dates using this lesson: {preview}")
 
             selected_notes = st.text_area(
-                "Notes",
+                "Notes for this gathering",
                 value=selected_row["notes"],
                 key=f"dashboard_notes_{selected_id}",
                 height=96,
-                placeholder="Add logistical notes, prayer focus, or reminders for this date.",
+                placeholder="Add prayer focus, reminders, or any details the group should know before meeting.",
             )
 
             has_unsaved_changes = (
@@ -2621,7 +3063,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                 st.markdown(
                     (
                         "<div class='sg-save-required'>"
-                        "You have unsaved detail changes. Click <b>Save meeting details</b>."
+                        "Gathering details are ready to save."
                         "</div>"
                     ),
                     unsafe_allow_html=True,
@@ -2664,16 +3106,16 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                         selected_notes,
                         current_main_meal,
                     )
-                    queue_message("Meeting details saved.")
+                    queue_message("Gathering details were saved.")
                     st.rerun()
 
         with tab_complete:
             render_section_header(
                 "Meeting Completion",
-                "When the meeting finishes, log it here to keep progress and history accurate.",
+                "When the gathering wraps up, log it here so the group schedule stays current.",
             )
             completion_confirm = st.checkbox(
-                "Confirm this meeting is complete",
+                "This gathering is complete",
                 key=f"dashboard_completion_confirm_{selected_id}",
             )
             if st.button(
@@ -2721,7 +3163,7 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
                         facilitator_name=current_facilitator,
                     )
                     st.session_state[f"dashboard_completion_confirm_{selected_id}"] = False
-                    queue_message("Meeting logged as completed.")
+                    queue_message("Thanks for serving. This gathering was logged as complete.")
                     st.rerun()
 
 
@@ -2743,23 +3185,9 @@ def render_lessons_page(lessons_df: pd.DataFrame) -> None:
         except (TypeError, ValueError):
             scheduled_date_by_week[week] = raw_date
 
-    render_page_header(
-        "Lesson Plans",
-        "Browse lessons, review discussion prompts, and keep facilitator notes organized.",
-        "Lessons",
-    )
-    done_count = len([week for week, status in status_map.items() if status == "Done"])
-    scheduled_count = (
-        len(set(upcoming_df["lesson_week"].astype(int).tolist())) if not upcoming_df.empty else 0
-    )
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Total lessons", str(len(weeks)))
-    m2.metric("Completed", str(done_count))
-    m3.metric("Scheduled", str(scheduled_count))
-
     with st.container(border=True):
         render_section_header(
-            "Filter Lessons",
+            "Lesson Plans",
             "Narrow by progress status or search by lesson theme.",
         )
         f1, f2 = st.columns([1, 1.6])
@@ -3071,7 +3499,7 @@ def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
     remaining_count = max(TOTAL_LESSONS - completed_count, 0)
     render_page_header(
         "Admin & Operations",
-        "Manage upcoming dates, family assignments, and historical meeting records.",
+        "Set gathering dates, update family lists, and keep the group's plan organized.",
         "Admin",
     )
     m1, m2, m3 = st.columns(3)
@@ -3506,7 +3934,7 @@ def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
 def render_settings_page(source_msg: str, lessons_count: int) -> None:
     render_page_header(
         "Settings",
-        "Manage local data source visibility, backups, and reset controls.",
+        "Take care of backups and local app data for this device.",
         "System",
     )
 
