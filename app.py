@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from calendar import Calendar, month_name
 from datetime import date, datetime
 from html import escape
 from pathlib import Path
@@ -906,6 +905,136 @@ def inject_global_styles() -> None:
             line-height: 1.4;
             color: var(--sg-muted);
         }
+        .sg-gathering-preview {
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius-lg);
+            background: var(--sg-surface);
+            padding: 0.92rem 0.96rem;
+        }
+        .sg-gathering-preview-head {
+            margin-bottom: 0.82rem;
+        }
+        .sg-gathering-preview-kicker {
+            margin: 0;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-gathering-preview-date {
+            margin: 0.26rem 0 0 0;
+            font-size: 1rem;
+            font-weight: 620;
+            color: var(--sg-text);
+            line-height: 1.2;
+        }
+        .sg-gathering-preview-date a {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+        .sg-gathering-preview-lesson {
+            margin: 0.18rem 0 0 0;
+            font-size: 0.86rem;
+            color: var(--sg-muted);
+            line-height: 1.35;
+        }
+        .sg-schedule-list {
+            display: grid;
+            gap: 0.9rem;
+            margin: 0.2rem 0 0.55rem 0;
+        }
+        .sg-schedule-month {
+            display: grid;
+            gap: 0.55rem;
+        }
+        .sg-schedule-month-title {
+            margin: 0;
+            font-size: 0.96rem;
+            font-weight: 620;
+            color: var(--sg-text);
+        }
+        .sg-schedule-entry-link {
+            display: block;
+            text-decoration: none !important;
+            color: inherit !important;
+        }
+        .sg-schedule-entry {
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius-md);
+            background: var(--sg-surface);
+            padding: 0.84rem 0.9rem;
+            transition: transform 100ms ease, box-shadow 100ms ease, border-color 100ms ease;
+        }
+        .sg-schedule-entry:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--sg-shadow-sm);
+            border-color: #b4c2b8;
+        }
+        .sg-schedule-entry-selected {
+            background: var(--sg-primary-soft);
+            border-color: #b4c2b8;
+            box-shadow: 0 0 0 2px rgba(219, 228, 222, 0.88);
+        }
+        .sg-schedule-entry-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+        .sg-schedule-date {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 620;
+            color: var(--sg-text);
+            line-height: 1.2;
+        }
+        .sg-schedule-subtitle {
+            margin: 0.16rem 0 0 0;
+            font-size: 0.8rem;
+            color: var(--sg-muted);
+            line-height: 1.35;
+        }
+        .sg-schedule-activities {
+            display: grid;
+            gap: 0.44rem;
+        }
+        .sg-schedule-activity {
+            border-top: 1px solid rgba(228, 222, 210, 0.9);
+            padding-top: 0.44rem;
+        }
+        .sg-schedule-activity:first-child {
+            border-top: none;
+            padding-top: 0;
+        }
+        .sg-schedule-activity-label {
+            margin: 0;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-schedule-activity-value {
+            margin: 0.18rem 0 0 0;
+            font-size: 0.9rem;
+            font-weight: 560;
+            color: var(--sg-text);
+            line-height: 1.3;
+        }
+        .sg-schedule-activity-note {
+            margin: 0.14rem 0 0 0;
+            font-size: 0.78rem;
+            color: var(--sg-muted);
+            line-height: 1.35;
+        }
+        .sg-schedule-footer {
+            margin: 0.6rem 0 0 0;
+            font-size: 0.78rem;
+            color: var(--sg-muted-soft);
+            line-height: 1.3;
+        }
         .sg-calendar-shell {
             overflow-x: auto;
             margin: 0.25rem 0 0.6rem 0;
@@ -1315,6 +1444,16 @@ def inject_global_styles() -> None:
             .sg-service-grid {
                 grid-template-columns: 1fr;
             }
+            .sg-gathering-preview {
+                padding: 0.78rem 0.8rem;
+            }
+            .sg-schedule-entry {
+                padding: 0.72rem 0.76rem;
+            }
+            .sg-schedule-entry-head {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
             .sg-calendar-month {
                 min-width: 100%;
                 padding: 0.7rem;
@@ -1385,6 +1524,25 @@ def inject_global_styles() -> None:
             }
             .sg-service-card {
                 padding: 0.72rem 0.76rem;
+            }
+            .sg-gathering-preview-date {
+                font-size: 0.94rem;
+            }
+            .sg-gathering-preview-lesson {
+                font-size: 0.8rem;
+            }
+            .sg-schedule-entry {
+                padding: 0.68rem 0.72rem;
+            }
+            .sg-schedule-date {
+                font-size: 0.94rem;
+            }
+            .sg-schedule-activity-value {
+                font-size: 0.84rem;
+            }
+            .sg-schedule-activity-note,
+            .sg-schedule-footer {
+                font-size: 0.74rem;
             }
             .sg-calendar-month {
                 padding: 0.65rem;
@@ -2134,208 +2292,92 @@ def render_upcoming_calendar(
         st.info("No upcoming dates yet.")
         return
 
-    meetings_by_date: Dict[date, List[dict]] = {}
-    for row in upcoming_df.to_dict(orient="records"):
-        raw_date = str(row.get("meeting_date", "")).strip()
-        try:
-            meeting_day = date.fromisoformat(raw_date)
-        except Exception:
-            continue
-        meetings_by_date.setdefault(meeting_day, []).append(row)
-
     selected_date_obj: date | None = None
     try:
         selected_date_obj = date.fromisoformat(str(selected_date))
     except Exception:
         selected_date_obj = None
 
-    upcoming_days = set(parsed_dates)
+    grouped_rows: Dict[str, List[dict]] = {}
+    for row in upcoming_df.to_dict(orient="records"):
+        raw_date = str(row.get("meeting_date", "")).strip()
+        try:
+            meeting_day = date.fromisoformat(raw_date)
+        except Exception:
+            continue
+        month_label = meeting_day.strftime("%B %Y")
+        grouped_rows.setdefault(month_label, []).append(row)
 
-    def month_start(d: date) -> date:
-        return d.replace(day=1)
-
-    def next_month(d: date) -> date:
-        if d.month == 12:
-            return date(d.year + 1, 1, 1)
-        return date(d.year, d.month + 1, 1)
-
-    current_month_start = month_start(date.today())
-    first_date = current_month_start
-    max_upcoming_month = month_start(max(parsed_dates))
-    min_end_month = next_month(current_month_start)
-    last_date = max(max_upcoming_month, min_end_month)
-
-    months: List[date] = []
-    cursor = first_date
-    while cursor <= last_date:
-        months.append(cursor)
-        cursor = next_month(cursor)
-
-    if not months:
-        st.info("No Sunday dates are in the upcoming meeting range yet.")
+    if not grouped_rows:
+        st.info("No upcoming dates yet.")
         return
 
-    month_key = "dashboard_calendar_month_idx"
-    selected_key = "dashboard_calendar_selected_date_cache"
-    month_lookup = {(m.year, m.month): idx for idx, m in enumerate(months)}
-    if month_key not in st.session_state:
-        st.session_state[month_key] = 0
+    st.caption("Choose a gathering date to open its serving details below.")
 
-    selected_changed = st.session_state.get(selected_key) != str(selected_date)
-    if selected_changed:
-        st.session_state[selected_key] = str(selected_date)
-        if selected_date_obj is not None:
-            idx = month_lookup.get((selected_date_obj.year, selected_date_obj.month))
-            if idx is not None:
-                st.session_state[month_key] = idx
-
-    if st.session_state[month_key] < 0:
-        st.session_state[month_key] = 0
-    if st.session_state[month_key] >= len(months):
-        st.session_state[month_key] = len(months) - 1
-
-    month_idx = int(st.session_state[month_key])
-    active_month = months[month_idx]
-    nav_left, nav_mid, nav_right = st.columns([0.28, 0.44, 0.28])
-    with nav_left:
-        if st.button(
-            "Prev month",
-            key="dashboard_calendar_prev_month",
-            disabled=month_idx <= 0,
-            use_container_width=True,
-        ):
-            st.session_state[month_key] = max(0, month_idx - 1)
-            st.rerun()
-    with nav_mid:
+    for month_label, rows in grouped_rows.items():
         st.markdown(
-            f"<p class='sg-calendar-nav-label'>{month_name[active_month.month]} {active_month.year}</p>",
+            f"<p class='sg-schedule-month-title'>{escape(month_label)}</p>",
             unsafe_allow_html=True,
         )
-    with nav_right:
-        if st.button(
-            "Next month",
-            key="dashboard_calendar_next_month",
-            disabled=month_idx >= (len(months) - 1),
-            use_container_width=True,
-        ):
-            st.session_state[month_key] = min(len(months) - 1, month_idx + 1)
-            st.rerun()
 
-    month_label = f"{month_name[active_month.month]} {active_month.year}"
-    month_rows = [
-        row
-        for row in upcoming_df.to_dict(orient="records")
-        if str(row.get("meeting_date", "")).startswith(
-            f"{active_month.year:04d}-{active_month.month:02d}-"
-        )
-    ]
-    month_gathering_count = len(month_rows)
-    month_open_need_count = len(
-        [row for row in month_rows if summarize_upcoming_meeting(row).get("open_needs")]
-    )
-    month_summary = f"{month_gathering_count} gathering{'s' if month_gathering_count != 1 else ''}"
-    if month_open_need_count:
-        month_summary = (
-            f"{month_summary} • {month_open_need_count} with open needs"
-        )
+        for row in rows:
+            raw_date = str(row.get("meeting_date", "")).strip()
+            try:
+                meeting_day = date.fromisoformat(raw_date)
+            except Exception:
+                continue
 
-    weekday_labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-    weekday_html = "".join(
-        f"<div class='sg-calendar-weekday'>{label}</div>" for label in weekday_labels
-    )
+            summary = summarize_upcoming_meeting(row)
+            is_selected = selected_date_obj is not None and meeting_day == selected_date_obj
+            host_value = str(summary.get("host_display", "")).strip() or "Open"
+            facilitator_value = str(summary.get("facilitator_display", "")).strip() or "Open"
+            meal_value = str(summary.get("meal_display", "")).strip() or "Meal support needed"
+            meal_note = str(summary.get("meal_note", "")).strip()
+            lesson_value = str(summary.get("lesson_title", "")).strip() or "Lesson not assigned"
+            overall_label = str(summary.get("overall_label", "Open opportunity")).strip()
+            overall_tone = str(summary.get("overall_tone", "open")).strip()
+            row_id = int(row["id"])
+            lesson_week = int(row.get("lesson_week", 0) or 0)
+            lesson_line = f"Lesson {lesson_week}"
+            if lesson_value:
+                lesson_line = f"{lesson_line} - {lesson_value}"
+            selected_pill = render_support_pill("Currently selected", "soft") if is_selected else ""
 
-    month_weeks = Calendar(firstweekday=6).monthdatescalendar(active_month.year, active_month.month)
-    day_cells: List[str] = []
-
-    for week in month_weeks:
-        for calendar_day in week:
-            in_month = calendar_day.month == active_month.month
-            has_meeting = calendar_day in upcoming_days
-            is_selected = selected_date_obj is not None and calendar_day == selected_date_obj
-            classes = ["sg-calendar-day"]
-            if in_month:
-                classes.append("sg-calendar-day-in-month")
-            else:
-                classes.append("sg-calendar-day-outside")
-            if has_meeting:
-                classes.append("sg-calendar-day-has-meeting")
-            if is_selected:
-                classes.append("sg-calendar-day-selected")
-
-            card_open = ""
-            card_close = ""
-            title_html = ""
-            caption_html = ""
-            pill_html = ""
-
-            if has_meeting:
-                meeting_rows_for_date = meetings_by_date.get(calendar_day, [])
-                summary = summarize_upcoming_meeting(meeting_rows_for_date[0]) if meeting_rows_for_date else {}
-                target_id: int | None = None
-                if meeting_rows_for_date:
-                    try:
-                        target_id = int(meeting_rows_for_date[0].get("id"))
-                    except Exception:
-                        target_id = None
-                if target_id is not None:
-                    classes.append("sg-calendar-day-clickable")
-                    card_open = (
-                        f"<a class='sg-calendar-day-link' href='?dashboard_pick={int(target_id)}#meeting-details' target='_self'>"
-                    )
-                    card_close = "</a>"
-
-                if str(summary.get("overall_tone", "")) == "ready":
-                    classes.append("sg-calendar-day-ready")
-
-                host_text = str(summary.get("host_display", "")).strip() or "Open"
-                facilitator_text = (
-                    str(summary.get("facilitator_display", "")).strip() or "Open"
-                )
-                lesson_text = str(summary.get("lesson_title", "")).strip() or "Gathering"
-                if len(host_text) > 15:
-                    host_text = host_text[:12].rstrip() + "..."
-                if len(facilitator_text) > 15:
-                    facilitator_text = facilitator_text[:12].rstrip() + "..."
-                if len(lesson_text) > 18:
-                    lesson_text = lesson_text[:15].rstrip() + "..."
-
-                title_html = (
-                    f"<p class='sg-calendar-day-detail'><strong>Host:</strong> {escape(host_text)}</p>"
-                )
-                caption_html = (
-                    f"<p class='sg-calendar-day-detail'><strong>Facilitator:</strong> {escape(facilitator_text)}</p>"
-                    f"<p class='sg-calendar-day-detail'><strong>Lesson:</strong> {escape(lesson_text)}</p>"
-                    "<p class='sg-calendar-day-caption'>Click for more details</p>"
-                )
-                pill_label = "Open" if summary.get("open_needs") else "Ready"
-                pill_tone = "open" if summary.get("open_needs") else "ready"
-                pill_html = (
-                    f"<div class='sg-calendar-day-pill'>{render_support_pill(pill_label, pill_tone)}</div>"
-                )
-
-            day_cells.append(
+            st.markdown(
                 (
-                    f"{card_open}<div class='{' '.join(classes)}'>"
-                    f"<p class='sg-calendar-day-number'>{calendar_day.day}</p>"
-                    f"{title_html}{caption_html}{pill_html}"
-                    f"</div>{card_close}"
-                )
+                    "<div class='sg-gathering-preview'>"
+                    "<div class='sg-gathering-preview-head'>"
+                    "<p class='sg-gathering-preview-kicker'>Upcoming gathering</p>"
+                    f"<p class='sg-gathering-preview-date'><a href='?dashboard_pick={row_id}#meeting-details' target='_self'>"
+                    f"{escape(meeting_day.strftime('%m/%d/%Y (%a.)'))}</a></p>"
+                    f"<p class='sg-gathering-preview-lesson'>{escape(lesson_line)}</p>"
+                    f"<div class='sg-pill-row'>{render_support_pill(overall_label, overall_tone)}{selected_pill}</div>"
+                    "</div>"
+                    "<div class='sg-service-grid'>"
+                    "<div class='sg-service-card'>"
+                    "<p class='sg-service-kicker'>Hosting</p>"
+                    f"<p class='sg-service-title'>{escape(host_value)}</p>"
+                    f"<p class='sg-service-detail'>{escape(str(summary.get('host_note', '')).strip())}</p>"
+                    f"{render_support_pill('Host', str(summary.get('host_tone', 'neutral')))}"
+                    "</div>"
+                    "<div class='sg-service-card'>"
+                    "<p class='sg-service-kicker'>Facilitating</p>"
+                    f"<p class='sg-service-title'>{escape(facilitator_value)}</p>"
+                    f"<p class='sg-service-detail'>{escape(str(summary.get('facilitator_note', '')).strip())}</p>"
+                    f"{render_support_pill('Facilitator', str(summary.get('facilitator_tone', 'neutral')))}"
+                    "</div>"
+                    "<div class='sg-service-card'>"
+                    "<p class='sg-service-kicker'>Meal Support</p>"
+                    f"<p class='sg-service-title'>{escape(meal_value)}</p>"
+                    f"<p class='sg-service-detail'>{escape(meal_note)}</p>"
+                    f"{render_support_pill('Meal', str(summary.get('meal_tone', 'neutral')))}"
+                    "</div>"
+                    "</div>"
+                    "<p class='sg-schedule-footer'>Click the date to open full gathering details</p>"
+                    "</div>"
+                ),
+                unsafe_allow_html=True,
             )
-
-    st.caption("Choose a gathering date to open its serving details below.")
-    month_html = (
-        "<div class='sg-calendar-shell'>"
-        "<div class='sg-calendar-month'>"
-        "<div class='sg-calendar-month-header'>"
-        f"<p class='sg-calendar-month-title'>{month_label}</p>"
-        f"<p class='sg-calendar-month-summary'>{escape(month_summary)}</p>"
-        "</div>"
-        f"<div class='sg-calendar-weekdays'>{weekday_html}</div>"
-        f"<div class='sg-calendar-grid'>{''.join(day_cells)}</div>"
-        "</div></div>"
-    )
-    st.markdown(month_html, unsafe_allow_html=True)
-
 
 def get_custom_questions(lesson_week: int) -> Dict[str, List[str]]:
     result = {level: [] for level in QUESTION_LEVELS}
@@ -2953,7 +2995,6 @@ def render_dashboard(lessons_df: pd.DataFrame) -> None:
             f"Meeting Details: {format_meeting_date(selected_meeting_date)}",
             "Start with the serving needs below. Hosting, facilitating, and meal support all update this gathering.",
         )
-        render_selected_meeting_summary(selected_row.to_dict())
         tab_signup, tab_details, tab_complete = st.tabs(["Serve", "Details", "Complete"])
 
         with tab_signup:
