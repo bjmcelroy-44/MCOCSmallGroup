@@ -1036,6 +1036,29 @@ def inject_global_styles() -> None:
             padding: 0.18rem 0.44rem;
             font-size: 0.64rem;
         }
+        .sg-simple-list {
+            display: grid;
+            gap: 0.52rem;
+        }
+        .sg-simple-row {
+            border: 1px solid var(--sg-border);
+            border-radius: var(--sg-radius-md);
+            background: var(--sg-surface);
+            padding: 0.72rem 0.82rem;
+        }
+        .sg-simple-row-title {
+            margin: 0;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--sg-text);
+            line-height: 1.25;
+        }
+        .sg-simple-row-meta {
+            margin: 0.2rem 0 0 0;
+            font-size: 0.8rem;
+            line-height: 1.38;
+            color: var(--sg-muted);
+        }
         .sg-lesson-rolodex-scroll {
             display: flex;
             gap: 0.56rem;
@@ -1222,9 +1245,17 @@ def inject_global_styles() -> None:
             .stButton > button,
             .stDownloadButton > button,
             .stFormSubmitButton > button {
-                min-height: 2.28rem;
-                font-size: 0.88rem;
-                padding: 0.36rem 0.62rem;
+                min-height: 2.8rem;
+                font-size: 0.92rem;
+                padding: 0.46rem 0.72rem;
+            }
+            div[data-baseweb="select"] > div,
+            div[data-baseweb="input"] > div,
+            div[data-baseweb="textarea"] > div {
+                min-height: 2.9rem;
+            }
+            div[data-baseweb="tab-list"] {
+                flex-wrap: wrap;
             }
             .stCaption {
                 font-size: 0.75rem;
@@ -1285,11 +1316,34 @@ def inject_global_styles() -> None:
                 grid-template-columns: 1fr;
             }
             .sg-calendar-month {
-                min-width: 700px;
+                min-width: 100%;
+                padding: 0.7rem;
             }
             .sg-calendar-day {
-                min-height: 100px;
+                min-height: 96px;
                 padding: 0.32rem 0.36rem;
+            }
+            .sg-calendar-shell {
+                overflow-x: visible;
+            }
+            .sg-calendar-month-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.18rem;
+            }
+            .sg-calendar-weekdays {
+                display: none;
+            }
+            .sg-calendar-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.5rem;
+            }
+            .sg-calendar-day-outside {
+                display: none;
+            }
+            div[data-testid="stDataFrame"],
+            div[data-testid="stDataEditor"] {
+                overflow-x: auto;
             }
             section[data-testid="stSidebar"] .stButton > button {
                 min-height: 2.12rem;
@@ -1322,6 +1376,42 @@ def inject_global_styles() -> None:
             }
             .sg-page-subtitle {
                 font-size: 0.85rem;
+            }
+            .sg-meeting-summary {
+                padding: 0.78rem 0.8rem;
+            }
+            .sg-meeting-summary-title {
+                font-size: 1.02rem;
+            }
+            .sg-service-card {
+                padding: 0.72rem 0.76rem;
+            }
+            .sg-calendar-month {
+                padding: 0.65rem;
+            }
+            .sg-calendar-grid {
+                grid-template-columns: 1fr;
+            }
+            .sg-calendar-day {
+                min-height: auto;
+                padding: 0.48rem 0.52rem;
+            }
+            .sg-calendar-day-number {
+                font-size: 0.82rem;
+            }
+            .sg-calendar-day-detail {
+                font-size: 0.66rem;
+                line-height: 1.22;
+            }
+            .sg-calendar-day-caption {
+                font-size: 0.66rem;
+                line-height: 1.2;
+            }
+            .sg-calendar-day-pill .sg-pill {
+                font-size: 0.66rem;
+            }
+            .sg-pill {
+                white-space: normal;
             }
         }
         </style>
@@ -3770,7 +3860,16 @@ def render_meeting_log_page(lessons_df: pd.DataFrame) -> None:
                 st.session_state["admin_edit_families"] = False
 
             if not st.session_state["admin_edit_families"]:
-                st.dataframe(families_df, hide_index=True, use_container_width=True)
+                family_cards = ['<div class="sg-simple-list">']
+                for family_name in families_df["Family"].tolist():
+                    family_cards.append(
+                        "<div class='sg-simple-row'>"
+                        f"<p class='sg-simple-row-title'>{escape(str(family_name))}</p>"
+                        "<p class='sg-simple-row-meta'>Available for host and facilitator sign-up.</p>"
+                        "</div>"
+                    )
+                family_cards.append("</div>")
+                st.markdown("".join(family_cards), unsafe_allow_html=True)
                 if st.button("Edit family list", use_container_width=True):
                     st.session_state["admin_edit_families"] = True
                     st.rerun()
