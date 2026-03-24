@@ -910,6 +910,40 @@ def inject_global_styles() -> None:
             border-radius: var(--sg-radius-lg);
             background: var(--sg-surface);
             padding: 0.92rem 0.96rem;
+            transition: transform 100ms ease, box-shadow 100ms ease, border-color 100ms ease;
+        }
+        .sg-gathering-preview:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--sg-shadow-sm);
+            border-color: #b4c2b8;
+        }
+        .sg-gathering-preview-selected {
+            background: var(--sg-primary-soft);
+            border-color: #a6b5aa;
+            box-shadow: 0 0 0 2px rgba(219, 228, 222, 0.92);
+        }
+        .sg-current-selection-banner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.42rem 0.58rem;
+            margin: 0.08rem 0 0.75rem 0;
+            padding: 0.6rem 0.72rem;
+            border: 1px solid #c8d4cc;
+            border-radius: 14px;
+            background: var(--sg-primary-soft);
+        }
+        .sg-current-selection-label {
+            font-size: 0.67rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-current-selection-date {
+            font-size: 0.94rem;
+            font-weight: 620;
+            color: var(--sg-text);
         }
         .sg-gathering-preview-head {
             margin-bottom: 0.82rem;
@@ -938,6 +972,41 @@ def inject_global_styles() -> None:
             font-size: 0.86rem;
             color: var(--sg-muted);
             line-height: 1.35;
+        }
+        .sg-gathering-preview-lesson a {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+        .sg-gathering-preview-lines {
+            display: grid;
+            gap: 0.38rem;
+            margin-top: 0.72rem;
+            padding-top: 0.72rem;
+            border-top: 1px solid rgba(228, 222, 210, 0.92);
+        }
+        .sg-gathering-preview-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.24rem 0.42rem;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .sg-gathering-preview-line-label {
+            min-width: 82px;
+            font-size: 0.69rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sg-muted-soft);
+            font-weight: 700;
+        }
+        .sg-gathering-preview-line-value {
+            font-size: 0.88rem;
+            color: var(--sg-text);
+            font-weight: 560;
+        }
+        .sg-gathering-preview-line-value-open {
+            color: #8b6f4a;
         }
         .sg-schedule-list {
             display: grid;
@@ -1447,6 +1516,12 @@ def inject_global_styles() -> None:
             .sg-gathering-preview {
                 padding: 0.78rem 0.8rem;
             }
+            .sg-gathering-preview-lines {
+                gap: 0.34rem;
+            }
+            .sg-gathering-preview-line-label {
+                min-width: 74px;
+            }
             .sg-schedule-entry {
                 padding: 0.72rem 0.76rem;
             }
@@ -1530,6 +1605,22 @@ def inject_global_styles() -> None:
             }
             .sg-gathering-preview-lesson {
                 font-size: 0.8rem;
+            }
+            .sg-current-selection-banner {
+                padding: 0.54rem 0.62rem;
+            }
+            .sg-current-selection-date {
+                font-size: 0.88rem;
+            }
+            .sg-gathering-preview-line {
+                gap: 0.22rem 0.34rem;
+            }
+            .sg-gathering-preview-line-label {
+                min-width: 68px;
+                font-size: 0.65rem;
+            }
+            .sg-gathering-preview-line-value {
+                font-size: 0.83rem;
             }
             .sg-schedule-entry {
                 padding: 0.68rem 0.72rem;
@@ -2312,7 +2403,18 @@ def render_upcoming_calendar(
         st.info("No upcoming dates yet.")
         return
 
-    st.caption("Choose a gathering date to open its serving details below.")
+    if selected_date_obj is not None:
+        st.markdown(
+            (
+                "<div class='sg-current-selection-banner'>"
+                "<span class='sg-current-selection-label'>Currently viewing</span>"
+                f"<span class='sg-current-selection-date'>{escape(selected_date_obj.strftime('%A, %B %d, %Y'))}</span>"
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
+
+    st.caption("Selected date stays highlighted below. Click a date for details or a lesson to open that lesson.")
 
     for month_label, rows in grouped_rows.items():
         st.markdown(
@@ -2331,46 +2433,79 @@ def render_upcoming_calendar(
             is_selected = selected_date_obj is not None and meeting_day == selected_date_obj
             host_value = str(summary.get("host_display", "")).strip() or "Open"
             facilitator_value = str(summary.get("facilitator_display", "")).strip() or "Open"
-            meal_value = str(summary.get("meal_display", "")).strip() or "Meal support needed"
-            meal_note = str(summary.get("meal_note", "")).strip()
             lesson_value = str(summary.get("lesson_title", "")).strip() or "Lesson not assigned"
             overall_label = str(summary.get("overall_label", "Open opportunity")).strip()
             overall_tone = str(summary.get("overall_tone", "open")).strip()
             row_id = int(row["id"])
             lesson_week = int(row.get("lesson_week", 0) or 0)
+            main_meal = str(summary.get("main_meal", "")).strip()
+            meal_signup_count = int(summary.get("meal_signup_count", 0) or 0)
             lesson_line = f"Lesson {lesson_week}"
             if lesson_value:
                 lesson_line = f"{lesson_line} - {lesson_value}"
-            selected_pill = render_support_pill("Currently selected", "soft") if is_selected else ""
+            lesson_html = escape(lesson_line)
+            if lesson_week > 0:
+                lesson_html = (
+                    f"<a href='?lesson_pick={lesson_week}' target='_self'>{lesson_html}</a>"
+                )
+            preview_class = "sg-gathering-preview sg-gathering-preview-selected" if is_selected else "sg-gathering-preview"
+            preview_kicker = "Currently viewing" if is_selected else "Upcoming gathering"
+            selected_pill = render_support_pill("Viewing now", "ready") if is_selected else ""
+            host_line_value = "TBD" if str(summary.get("host_tone", "")) == "open" else host_value
+            facilitator_line_value = (
+                "TBD" if str(summary.get("facilitator_tone", "")) == "open" else facilitator_value
+            )
+            if main_meal:
+                meal_line_value = main_meal
+                if meal_signup_count > 0:
+                    meal_line_value = (
+                        f"{meal_line_value} ({meal_signup_count} support item"
+                        f"{'s' if meal_signup_count != 1 else ''})"
+                    )
+                else:
+                    meal_line_value = f"{meal_line_value} (support open)"
+                meal_line_is_open = False
+            else:
+                meal_line_value = "TBD"
+                meal_line_is_open = True
+
+            host_value_class = "sg-gathering-preview-line-value"
+            if host_line_value == "TBD":
+                host_value_class += " sg-gathering-preview-line-value-open"
+
+            facilitator_value_class = "sg-gathering-preview-line-value"
+            if facilitator_line_value == "TBD":
+                facilitator_value_class += " sg-gathering-preview-line-value-open"
+
+            meal_value_class = "sg-gathering-preview-line-value"
+            if meal_line_is_open:
+                meal_value_class += " sg-gathering-preview-line-value-open"
 
             st.markdown(
                 (
-                    "<div class='sg-gathering-preview'>"
+                    f"<div class='{preview_class}'>"
                     "<div class='sg-gathering-preview-head'>"
-                    "<p class='sg-gathering-preview-kicker'>Upcoming gathering</p>"
+                    f"<p class='sg-gathering-preview-kicker'>{preview_kicker}</p>"
                     f"<p class='sg-gathering-preview-date'><a href='?dashboard_pick={row_id}#meeting-details' target='_self'>"
                     f"{escape(meeting_day.strftime('%m/%d/%Y (%a.)'))}</a></p>"
-                    f"<p class='sg-gathering-preview-lesson'>{escape(lesson_line)}</p>"
+                    f"<p class='sg-gathering-preview-lesson'>{lesson_html}</p>"
                     f"<div class='sg-pill-row'>{render_support_pill(overall_label, overall_tone)}{selected_pill}</div>"
                     "</div>"
-                    "<div class='sg-service-grid'>"
-                    "<div class='sg-service-card'>"
-                    "<p class='sg-service-kicker'>Hosting</p>"
-                    f"<p class='sg-service-title'>{escape(host_value)}</p>"
-                    f"<p class='sg-service-detail'>{escape(str(summary.get('host_note', '')).strip())}</p>"
+                    "<div class='sg-gathering-preview-lines'>"
+                    "<p class='sg-gathering-preview-line'>"
+                    "<span class='sg-gathering-preview-line-label'>Hosting</span>"
+                    f"<span class='{host_value_class}'>{escape(host_line_value)}</span>"
+                    "</p>"
+                    "<p class='sg-gathering-preview-line'>"
+                    "<span class='sg-gathering-preview-line-label'>Facilitating</span>"
+                    f"<span class='{facilitator_value_class}'>{escape(facilitator_line_value)}</span>"
+                    "</p>"
+                    "<p class='sg-gathering-preview-line'>"
+                    "<span class='sg-gathering-preview-line-label'>Meal</span>"
+                    f"<span class='{meal_value_class}'>{escape(meal_line_value)}</span>"
+                    "</p>"
                     "</div>"
-                    "<div class='sg-service-card'>"
-                    "<p class='sg-service-kicker'>Facilitating</p>"
-                    f"<p class='sg-service-title'>{escape(facilitator_value)}</p>"
-                    f"<p class='sg-service-detail'>{escape(str(summary.get('facilitator_note', '')).strip())}</p>"
-                    "</div>"
-                    "<div class='sg-service-card'>"
-                    "<p class='sg-service-kicker'>Meal Support</p>"
-                    f"<p class='sg-service-title'>{escape(meal_value)}</p>"
-                    f"<p class='sg-service-detail'>{escape(meal_note)}</p>"
-                    "</div>"
-                    "</div>"
-                    "<p class='sg-schedule-footer'>Click the date to open full gathering details</p>"
+                    "<p class='sg-schedule-footer'>Click the date for gathering details or the lesson to open that lesson</p>"
                     "</div>"
                 ),
                 unsafe_allow_html=True,
